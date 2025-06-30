@@ -1,4 +1,3 @@
-# typed: false
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -11,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_26_133751) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_30_174223) do
   create_table "equipamentos", force: :cascade do |t|
     t.string "nome"
     t.decimal "valor_hora"
@@ -42,6 +41,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_26_133751) do
     t.index ["proposta_id"], name: "index_funcaos_propostas_on_proposta_id"
   end
 
+  create_table "proposta_funcao", force: :cascade do |t|
+    t.integer "proposta_id", null: false
+    t.integer "funcao_id", null: false
+    t.decimal "valor_hora", null: false
+    t.decimal "horas_previstas", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["funcao_id"], name: "index_proposta_funcao_on_funcao_id"
+    t.index ["proposta_id"], name: "index_proposta_funcao_on_proposta_id"
+  end
+
   create_table "propostas", force: :cascade do |t|
     t.integer "revisao"
     t.decimal "quantidade_horas"
@@ -53,4 +63,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_26_133751) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "proposta_funcao", "funcaos"
+  add_foreign_key "proposta_funcao", "propostas"
 end

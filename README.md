@@ -1,3 +1,11 @@
 # 28/06
 
-- ENTENDER COMO SOMAR TODOS OS VALORES DE VENDA DE FUNÇÕES E EQUIPAMENTOS NA CLASSE PROPOSTA
+## Atualização
+
+### Propostas/new
+
+- Número de revisão atumático
+- Valor da hora precisa ser atríbuido a cada funçõao escolhida
+- Despesa indireta não deve aparecer
+- Margem fixa não deve aparecer
+- Horas previstas deve ser colocado para cada função adicionada

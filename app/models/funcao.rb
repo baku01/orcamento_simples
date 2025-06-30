@@ -19,6 +19,9 @@ class Funcao < ApplicationRecord
 
   before_validation :formatar_nome
 
+  has_many :proposta_funcoes, dependent: :destroy
+  has_many :propostas, through: :proposta_funcoes
+
   enum :tipo, { moi: 0, mod: 1 }
   validates :nome, presence: true, length: { maximum: 25 }
   validates :valor_base, presence: true, numericality: { greater_than: 0 }

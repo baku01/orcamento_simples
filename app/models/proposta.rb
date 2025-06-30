@@ -22,6 +22,7 @@ class Proposta < ApplicationRecord
 
   has_many :proposta_funcoes, dependent: :destroy
   has_many :funcoes, through: :proposta_funcoes
+
   has_many :proposta_equipamentos, dependent: :destroy
   has_many :equipamentos, through: :proposta_equipamentos
 
@@ -44,5 +45,16 @@ class Proposta < ApplicationRecord
     raise ArgumentError, "Valor base da função com id #{id_funcao} é nulo." if valor_base.nil?
 
     valor_base
+  end
+
+  private
+
+  sig { void }
+  def definir_revisao
+    revisao_max = T.let(Proposta.maximum(:revisao), T.nilable(Integer))
+
+    ultima_revisao = revisao_max || 0
+
+    self.revisao = ultima_revisao + 1
   end
 end

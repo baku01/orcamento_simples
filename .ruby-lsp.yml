@@ -1,0 +1,57 @@
+# Ruby LSP configuration file
+# See: https://shopify.github.io/ruby-lsp/
+
+# Enable Sorbet support
+enabledFeatures:
+  - "documentSymbol"
+  - "foldingRange"
+  - "selectionRange"
+  - "semanticHighlighting"
+  - "formatting"
+  - "onTypeFormatting"
+  - "codeAction"
+  - "diagnostic"
+  - "completion"
+  - "hover"
+  - "inlayHint"
+  - "signatureHelp"
+  - "definition"
+  - "workspaceSymbol"
+
+# Sorbet configuration
+sorbet:
+  enabled: true
+
+# Formatter configuration
+formatter: auto
+
+# Enable experimental features
+experimental:
+  # Enable Rails support
+  rails: true
+
+# RSpec configuration
+rspec:
+  enabled: true
+
+# Exclude certain paths from analysis
+ignore:
+  - "vendor/**/*"
+  - "tmp/**/*"
+  - "log/**/*"
+  - "node_modules/**/*"
+  - "public/**/*"
+  - "coverage/**/*"
+  - "sorbet/rbi/gems/**/*" # Generated RBI files
+
+# Enable code lens
+codeLens:
+  enabled: true
+
+# Enable inlay hints
+inlayHints:
+  enabled: true
+
+# Enable type checking
+typeChecking:
+  enabled: true

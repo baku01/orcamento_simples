@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: CalculadoraOrcamentariaService
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "CalculadoraOrcamentariaService";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (C)</a> &raquo;
+    
+    
+    <span class="title">CalculadoraOrcamentariaService</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: CalculadoraOrcamentariaService
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  <dl>
+      <dt>Extended by:</dt>
+      <dd>T::Sig</dd>
+  </dl>
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>app/services/calculadora_orcamentaria_service.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>== CalculadoraOrcamentariaService</p>
+
+<p>Serviço responsável pelos cálculos de criação de propostas orçamentárias.</p>
+
+<p>=== Exemplo de uso:
+  CalculadoraOrcamentariaService.taxa_de_variacao_funcao(BigDecimal(“100”), BigDecimal(“120”))
+  CalculadoraOrcamentariaService.valor_venda_mo(BigDecimal(“50”), BigDecimal(“100”), BigDecimal(“0.2”), 10)
+  CalculadoraOrcamentariaService.valor_venda_eqp(100.0, BigDecimal(“0.1”), BigDecimal(“0.2”), BigDecimal(“0.05”), 8)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#custos_variaveis-class_method" title="custos_variaveis (class method)">.<strong>custos_variaveis</strong>(valor_custo:, margem_lucro:)  &#x21d2; BigDecimal </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Calcula o valor total dos custos variáveis de um serviço, considerando a margem de lucro.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#taxa_de_variacao_funcao-class_method" title="taxa_de_variacao_funcao (class method)">.<strong>taxa_de_variacao_funcao</strong>(valor_base:, valor_base_adicional:)  &#x21d2; BigDecimal </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Calcula a taxa de variação relativa entre dois valores.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#valor_venda_eqp-class_method" title="valor_venda_eqp (class method)">.<strong>valor_venda_eqp</strong>(valor_hora:, despesa_indireta:, margem_lucro_fixa:, imposto:, quantidade_horas:)  &#x21d2; BigDecimal </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Calcula o valor de venda de equipamentos.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#valor_venda_mo-class_method" title="valor_venda_mo (class method)">.<strong>valor_venda_mo</strong>(valor_hora:, valor_base:, taxa_variacao:, quantidade_horas:)  &#x21d2; BigDecimal </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Calcula o valor de venda da mão de obra.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="custos_variaveis-class_method">
+  
+    .<strong>custos_variaveis</strong>(valor_custo:, margem_lucro:)  &#x21d2; <tt>BigDecimal</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Calcula o valor total dos custos variáveis de um serviço, considerando a margem de lucro.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_custos_variaveis'>custos_variaveis</span><span class='lparen'>(</span><span class='float'>100.0</span><span class='comma'>,</span> <span class='float'>0.2</span><span class='rparen'>)</span>
+<span class='comment'>#=&gt; 120.0</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>valor_custo</span>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Custo base do serviço.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>margem_lucro</span>
+      
+      
+        <span class='type'>(<tt>Float</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Percentual da margem de lucro a ser aplicada (ex: 0.2 para 20%).</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Soma do custo base com a margem de lucro aplicada.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+108
+109
+110</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 108</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_custos_variaveis'>custos_variaveis</span><span class='lparen'>(</span><span class='label'>valor_custo:</span><span class='comma'>,</span> <span class='label'>margem_lucro:</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_valor_custo'>valor_custo</span> <span class='op'>+</span> <span class='lparen'>(</span><span class='id identifier rubyid_valor_custo'>valor_custo</span> <span class='op'>*</span> <span class='id identifier rubyid_margem_lucro'>margem_lucro</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="taxa_de_variacao_funcao-class_method">
+  
+    .<strong>taxa_de_variacao_funcao</strong>(valor_base:, valor_base_adicional:)  &#x21d2; <tt>BigDecimal</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Calcula a taxa de variação relativa entre dois valores.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_taxa_de_variacao_funcao'>taxa_de_variacao_funcao</span><span class='lparen'>(</span><span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>100</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>120</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span>
+<span class='comment'>#=&gt; 0.2</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>valor_base</span>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Valor inicial (base) para o cálculo.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>valor_base_adicional</span>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Valor adicional para o cálculo.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Taxa de variação relativa (ex: 0.2 para 20% de aumento).</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+29
+30
+31</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 29</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_taxa_de_variacao_funcao'>taxa_de_variacao_funcao</span><span class='lparen'>(</span><span class='label'>valor_base:</span><span class='comma'>,</span> <span class='label'>valor_base_adicional:</span><span class='rparen'>)</span>
+  <span class='lparen'>(</span><span class='id identifier rubyid_valor_base_adicional'>valor_base_adicional</span> <span class='op'>-</span> <span class='id identifier rubyid_valor_base'>valor_base</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="valor_venda_eqp-class_method">
+  
+    .<strong>valor_venda_eqp</strong>(valor_hora:, despesa_indireta:, margem_lucro_fixa:, imposto:, quantidade_horas:)  &#x21d2; <tt>BigDecimal</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Calcula o valor de venda de equipamentos.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_valor_venda_eqp'>valor_venda_eqp</span><span class='lparen'>(</span>
+  <span class='float'>100.0</span><span class='comma'>,</span>
+  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.1</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.2</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.05</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='int'>8</span>
+<span class='rparen'>)</span>
+<span class='comment'>#=&gt; 144.73684210526315</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>valor_hora</span>
+      
+      
+        <span class='type'>(<tt>Float</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Valor da hora do equipamento.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>despesa_indireta</span>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Percentual de despesa indireta.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>margem_lucro_fixa</span>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Percentual de margem de lucro.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>imposto</span>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Percentual de impostos.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>quantidade_horas</span>
+      
+      
+        <span class='type'>(<tt>Float</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Quantidade de horas de uso do equipamento.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Valor de venda do equipamento.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+88
+89
+90
+91
+92
+93
+94
+95
+96</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 88</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_valor_venda_eqp'>valor_venda_eqp</span><span class='lparen'>(</span>
+  <span class='label'>valor_hora:</span><span class='comma'>,</span>
+  <span class='label'>despesa_indireta:</span><span class='comma'>,</span>
+  <span class='label'>margem_lucro_fixa:</span><span class='comma'>,</span>
+  <span class='label'>imposto:</span><span class='comma'>,</span>
+  <span class='label'>quantidade_horas:</span>
+<span class='rparen'>)</span>
+  <span class='lparen'>(</span><span class='id identifier rubyid_valor_hora'>valor_hora</span> <span class='op'>*</span> <span class='lparen'>(</span><span class='id identifier rubyid_despesa_indireta'>despesa_indireta</span> <span class='op'>/</span> <span class='lparen'>(</span><span class='int'>1</span> <span class='op'>-</span> <span class='lparen'>(</span><span class='id identifier rubyid_margem_lucro_fixa'>margem_lucro_fixa</span> <span class='op'>+</span> <span class='id identifier rubyid_imposto'>imposto</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>*</span> <span class='id identifier rubyid_quantidade_horas'>quantidade_horas</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="valor_venda_mo-class_method">
+  
+    .<strong>valor_venda_mo</strong>(valor_hora:, valor_base:, taxa_variacao:, quantidade_horas:)  &#x21d2; <tt>BigDecimal</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Calcula o valor de venda da mão de obra.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_valor_venda_mo'>valor_venda_mo</span><span class='lparen'>(</span>
+  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>50</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>100</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.2</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='int'>10</span>
+<span class='rparen'>)</span>
+<span class='comment'>#=&gt; 600.0</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>valor_hora</span>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Valor da hora de trabalho.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>valor_base</span>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Valor base inicial.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>taxa_variacao</span>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Taxa de variação a ser aplicada.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>quantidade_horas</span>
+      
+      
+        <span class='type'>(<tt>Float</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Quantidade de horas trabalhadas.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>BigDecimal</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Valor total de venda da mão de obra.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+57
+58
+59</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 57</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_valor_venda_mo'>valor_venda_mo</span><span class='lparen'>(</span><span class='label'>valor_hora:</span><span class='comma'>,</span> <span class='label'>valor_base:</span><span class='comma'>,</span> <span class='label'>taxa_variacao:</span><span class='comma'>,</span> <span class='label'>quantidade_horas:</span><span class='rparen'>)</span>
+  <span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_valor_hora'>valor_hora</span> <span class='op'>*</span> <span class='id identifier rubyid_taxa_variacao'>taxa_variacao</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='id identifier rubyid_valor_base'>valor_base</span><span class='rparen'>)</span> <span class='op'>*</span> <span class='id identifier rubyid_quantidade_horas'>quantidade_horas</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Mon Jun 30 10:44:40 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.4.4).
+</div>
+
+    </div>
+  </body>
+</html>

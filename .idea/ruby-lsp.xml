@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RubyLspState">
+    <option name="enableExclusiveFormatting" value="true" />
+    <option name="enabled" value="true" />
+    <option name="experimentalFeaturesEnabled" value="true" />
+    <option name="useBundler" value="true" />
+  </component>
+</project>

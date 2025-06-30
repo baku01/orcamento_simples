@@ -1,0 +1,16 @@
+--dir=.
+
+--ignore=vendor/
+--ignore=tmp/
+--ignore=log/
+--ignore=public/
+--ignore=node_modules/
+--ignore=coverage/
+--ignore=db/migrate/
+--ignore=bin/
+
+--allowed-extension=.rb
+--allowed-extension=.rbi
+--allowed-extension=.rake
+
+--enable-experimental-requires-ancestor

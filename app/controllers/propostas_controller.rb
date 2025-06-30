@@ -9,5 +9,6 @@ class PropostasController < ApplicationController
   sig { void }
   def new
     @proposta = Proposta.new
+    @funcoes = Funcao.all
   end
 end

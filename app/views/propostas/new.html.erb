@@ -298,60 +298,73 @@
               <% end %>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-hash"></i></span>
-                <%= form.number_field :revisao, class: "form-control", min: 1, required: true, placeholder: "Ex: 1", data: { proposta_form_target: "revisao", action: "input->proposta-form#calculate" }, value: @proposta.revisao || 1 %>
-              </div>
-            </div>
-            <div class="col-md-6 mb-4">
-              <%= form.label :quantidade_horas, class: "form-label" do %>
-                <i class="bi bi-clock-history"></i> Horas Previstas
-              <% end %>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-clock"></i></span>
-                <%= form.number_field :quantidade_horas, class: "form-control", step: 0.5, min: 0, required: true, placeholder: "Ex: 40.5", data: { proposta_form_target: "horas", action: "input->proposta-form#calculate" } %>
+                <%= form.number_field :revisao, class: "form-control", min: 1, required: true, placeholder: "Ex: 1" %>
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-6 mb-4">
-              <%= form.label :valor_hora, class: "form-label" do %>
-                <i class="bi bi-currency-dollar"></i> Valor da Hora
+
+          <hr class="section-divider">
+
+          <div class="mb-4">
+            <h5 class="form-label">
+              <i class="bi bi-list-check"></i> Funções da Proposta
+            </h5>
+            <small class="text-muted">Selecione as funções e preencha os campos de horas previstas e valor/hora para cada.</small>
+            <div>
+              <% @funcoes.each_with_index do |funcao, idx| %>
+                <div class="card my-3 p-3">
+                  <div class="row align-items-center">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                      <label class="form-label" for="funcao_<%= funcao.id %>">
+                        <i class="bi bi-person-gear"></i> <%= funcao.nome %>
+                      </label>
+                      <div class="input-group">
+                        <span class="input-group-text">
+                          <%= check_box_tag "proposta[proposta_funcoes_attributes][#{idx}][funcao_id]", funcao.id, false, id: "funcao_#{funcao.id}", class: "form-check-input" %>
+                        </span>
+                        <input type="text" class="form-control bg-light" value="Selecionar" disabled>
+                      </div>
+                    </div>
+                    <div class="col-md-4 mb-3 mb-md-0">
+                      <label class="form-label" for="horas_<%= funcao.id %>">
+                        <i class="bi bi-clock-history"></i> Horas Previstas
+                      </label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-clock"></i></span>
+                        <%= number_field_tag "proposta[proposta_funcoes_attributes][#{idx}][quantidade_horas]", nil, step: 0.5, min: 0, class: "form-control", placeholder: "Horas previstas", id: "horas_#{funcao.id}" %>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label" for="valor_<%= funcao.id %>">
+                        <i class="bi bi-currency-dollar"></i> Valor/Hora
+                      </label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-cash"></i></span>
+                        <%= number_field_tag "proposta[proposta_funcoes_attributes][#{idx}][valor_hora]", funcao.valor_base, step: 0.01, min: 0, class: "form-control", placeholder: "Valor/hora", id: "valor_#{funcao.id}" %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               <% end %>
-              <div class="input-group">
-                <span class="input-group-text">R$</span>
-                <%= form.number_field :valor_hora, class: "form-control", step: 0.01, min: 0, required: true, placeholder: "150.00", data: { proposta_form_target: "valorHora", action: "input->proposta-form#calculate" } %>
-              </div>
-            </div>
-            <div class="col-md-6 mb-4">
-              <%= form.label :despesa_indireta, class: "form-label" do %>
-                <i class="bi bi-receipt"></i> Despesas Indiretas
-              <% end %>
-              <div class="input-group">
-                <span class="input-group-text">R$</span>
-                <%= form.number_field :despesa_indireta, class: "form-control", step: 0.01, min: 0, required: true, placeholder: "350.00", data: { proposta_form_target: "despesas", action: "input->proposta-form#calculate" } %>
-              </div>
             </div>
           </div>
+
+          <hr class="section-divider">
+
           <div class="row">
-            <div class="col-md-6 mb-4">
-              <%= form.label :margem_lucro_fixa, class: "form-label" do %>
-                <i class="bi bi-percent"></i> Margem Fixa
-              <% end %>
-              <div class="input-group">
-                <span class="input-group-text">%</span>
-                <%= form.number_field :margem_lucro_fixa, class: "form-control", step: 0.01, min: 0, max: 100, required: true, placeholder: "20.00", data: { proposta_form_target: "margemFixa", action: "input->proposta-form#calculate" } %>
-              </div>
-            </div>
             <div class="col-md-6 mb-4">
               <%= form.label :margem_lucro, class: "form-label" do %>
                 <i class="bi bi-graph-up-arrow"></i> Margem Adicional
               <% end %>
               <div class="input-group">
                 <span class="input-group-text">%</span>
-                <%= form.number_field :margem_lucro, class: "form-control", step: 0.01, min: 0, max: 100, required: true, placeholder: "15.00", data: { proposta_form_target: "margemAdicional", action: "input->proposta-form#calculate" } %>
+                <%= form.number_field :margem_lucro, class: "form-control", step: 0.01, min: 0, max: 100, required: true, placeholder: "15.00" %>
               </div>
             </div>
           </div>
+
           <hr class="section-divider">
+
           <div class="calculation-section">
             <h5 class="calculation-title">
               <i class="bi bi-calculator-fill"></i>
@@ -361,14 +374,6 @@
               <li>
                 <span>Valor Base (Horas × Valor/Hora)</span>
                 <strong data-proposta-form-target="valorBaseDisplay">R$ 0,00</strong>
-              </li>
-              <li>
-                <span>+ Despesas Indiretas</span>
-                <strong data-proposta-form-target="despesasDisplay">R$ 0,00</strong>
-              </li>
-              <li>
-                <span>+ Margem Fixa</span>
-                <strong data-proposta-form-target="margemFixaDisplay">R$ 0,00</strong>
               </li>
               <li>
                 <span>+ Margem Adicional</span>
@@ -386,6 +391,7 @@
             </div>
             <%= form.hidden_field :valor_total, data: { proposta_form_target: "valorTotalHidden" } %>
           </div>
+
           <div class="d-grid mt-4">
             <%= form.submit "Criar Proposta", class: "btn btn-submit" %>
           </div>

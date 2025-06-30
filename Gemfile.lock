@@ -476,7 +476,7 @@ GEM
       parser (>= 2.7)
       sorbet-coerce (>= 0.2.6)
       sorbet-runtime (>= 0.5.9892)
-    sorbet-result (1.2.0)
+    sorbet-result (1.4.0)
       sorbet-runtime (~> 0.5)
     sorbet-runtime (0.5.12210)
     sorbet-static (0.5.12210-aarch64-linux)

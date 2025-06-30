@@ -1,404 +1,253 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Nova Proposta</title>
+  <title>Nova Proposta | Versão Dinâmica</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
     :root {
       --primary-color: #6366f1;
+      --primary-rgb: 99, 102, 241;
       --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
       --success-color: #10b981;
-      --danger-bg: #fef2f2;
-      --danger-text: #dc2626;
-      --body-bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-      --card-bg: rgba(255, 255, 255, 0.95);
+      --success-rgb: 16, 185, 129;
+      --light-bg: #f8fafc;
+      --card-bg: #ffffff;
       --text-color: #1e293b;
-      --border-radius: 16px;
+      --muted-text-color: #64748b;
+      --border-color: #e2e8f0;
+      --border-radius: 1rem;
       --font-family: 'Inter', sans-serif;
     }
+
     body {
-      background: var(--body-bg);
+      background-color: var(--light-bg);
       font-family: var(--font-family);
       color: var(--text-color);
-      font-size: 14px;
-      line-height: 1.6;
-      padding: 2rem 0;
     }
-    .main-container {
-      max-width: 950px;
-      margin: 0 auto;
-      padding: 0 1.5rem;
-    }
-    .form-card {
-      background: var(--card-bg);
+
+    .form-section {
+      background-color: var(--card-bg);
       border-radius: var(--border-radius);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      margin-bottom: 2rem;
-    }
-    .form-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
-    }
-    .card-header {
-      background: var(--primary-gradient);
-      color: white;
-      padding: 2rem 2.5rem;
-      border-radius: var(--border-radius) var(--border-radius) 0 0;
-      position: relative;
-    }
-    .card-header h2 {
-      font-weight: 600;
-      font-size: 1.75rem;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      position: relative;
-      z-index: 2;
-    }
-    .card-header h2 i {
-      font-size: 2rem;
-      opacity: 0.9;
-    }
-    .card-body {
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color);
       padding: 2.5rem;
     }
+
+    .summary-section {
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+    }
+
     .form-label {
       font-weight: 600;
-      color: var(--text-color);
-      margin-bottom: 0.75rem;
       font-size: 0.875rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .form-label i {
-      color: var(--primary-color);
-      font-size: 1rem;
-    }
-    .input-group {
-      position: relative;
       margin-bottom: 0.5rem;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .input-group-text {
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-      border: 2px solid #e2e8f0;
-      border-right: none;
-      color: var(--primary-color);
-      font-weight: 600;
-      font-size: 0.9rem;
-      border-radius: 10px 0 0 10px;
-      padding: 0 1rem;
-      display: flex;
-      align-items: center;
-      min-width: 60px;
-      justify-content: center;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .form-control, .form-select {
+        height: 50px;
+        border: 1px solid var(--border-color);
+        font-size: 1rem;
+        background-color: #fff;
     }
-    .form-control {
-      height: 56px;
-      border: 2px solid #e2e8f0;
-      border-radius: 0 10px 10px 0;
-      font-size: 1rem;
-      font-weight: 500;
-      padding: 0 1.25rem;
-      background: #ffffff;
-      color: var(--text-color);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.05);
-      flex: 1 1 auto;
-      width: 1%;
-      min-width: 0;
+    .form-control:disabled {
+        background-color: var(--light-bg);
+        cursor: not-allowed;
     }
-    .form-control:focus {
-      border-color: var(--primary-color);
-      background: #f8fafc;
-      outline: none;
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+        outline: none;
     }
-    .section-divider {
-      border: none;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
-      margin: 3rem 0;
-      opacity: 0.3;
-      position: relative;
+
+    .section-title {
+        font-weight: 700;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
     }
-    .calculation-section {
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 2rem;
-      margin: 2rem 0;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    .section-title i { color: var(--primary-color); }
+
+    /* Toggle Switch */
+    .form-switch { padding-left: 3.5em; }
+    .form-check-input {
+      width: 2.5em;
+      height: 1.5em;
+      cursor: pointer;
+      background-color: var(--border-color);
+      border-color: var(--border-color);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
     }
-    .calculation-title {
-      color: var(--text-color);
-      font-weight: 700;
-      font-size: 1.25rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      position: relative;
-      z-index: 2;
+    .form-check-input:checked {
+      background-color: var(--success-color);
+      border-color: var(--success-color);
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
     }
-    .calculation-title i {
-      color: var(--primary-color);
-      font-size: 1.5rem;
+
+    /* Tabela de Funções Interativa */
+    .funcoes-table tbody tr {
+      transition: background-color 0.3s ease;
     }
-    .calculation-summary {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 2rem 0;
-      font-size: 1rem;
-      position: relative;
-      z-index: 2;
+    .funcoes-table tbody tr.is-active {
+      background-color: rgba(var(--success-rgb), 0.07);
     }
-    .calculation-summary li {
+    .funcoes-table td {
+        vertical-align: middle;
+    }
+    .subtotal-cell {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--muted-text-color);
+        text-align: right;
+    }
+
+    /* Resumo da Proposta */
+    .summary-list li {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      margin-bottom: 0.75rem;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(10px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
     }
-    .calculation-summary li:hover {
-      background: rgba(255, 255, 255, 0.95);
-      transform: translateX(8px);
-    }
-    .calculation-summary span {
-      color: #64748b;
-      font-weight: 500;
-    }
-    .calculation-summary strong {
-      font-weight: 700;
-      color: var(--text-color);
-      font-size: 1.05rem;
-    }
+    .summary-list li:last-child { border-bottom: none; }
+    .summary-list span { color: var(--muted-text-color); }
+    .summary-list strong { font-weight: 600; }
+
     .total-summary {
-      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-      border: none;
-      border-radius: 12px;
-      padding: 2rem;
-      text-align: center;
+      background: var(--primary-gradient);
+      border-radius: 0.75rem;
+      padding: 1.5rem 2rem;
+      margin-top: 1.5rem;
       color: white;
-      font-size: 1.5rem;
-      font-weight: 700;
-      box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.3);
-      position: relative;
-      overflow: hidden;
-      z-index: 2;
-      margin-top: 1rem;
+      text-align: left;
     }
-    .total-label {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      opacity: 0.95;
-      position: relative;
-      z-index: 3;
-    }
-    .total-value {
-      font-size: 2.5rem;
-      font-weight: 800;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      position: relative;
-      z-index: 3;
-    }
+    .total-label { font-weight: 500; opacity: 0.9; margin-bottom: 0.25rem; }
+    .total-value { font-size: 2.25rem; font-weight: 800; }
+
     .btn-submit {
       background: var(--primary-gradient);
       border: none;
-      padding: 1rem 3rem;
+      padding: 1rem 2rem;
       font-size: 1.1rem;
-      font-weight: 700;
+      font-weight: 600;
       color: white;
-      border-radius: 12px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      box-shadow: 0 8px 25px -5px rgba(99, 102, 241, 0.4);
-      position: relative;
-      overflow: hidden;
+      border-radius: 0.5rem;
+      width: 100%;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 15px -5px rgba(var(--primary-rgb), 0.4);
     }
     .btn-submit:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 15px 35px -5px rgba(99, 102, 241, 0.5);
+      transform: translateY(-3px);
+      box-shadow: 0 7px 25px -5px rgba(var(--primary-rgb), 0.5);
     }
-    @media (max-width: 768px) {
-      .main-container { padding: 0 1rem; }
-      .card-body, .card-header { padding: 2rem 1.5rem; }
-      .form-control { height: 50px; font-size: 0.95rem; }
-      .calculation-section { padding: 1.5rem; }
-      .total-summary { padding: 1.5rem; font-size: 1.2rem; }
-      .total-value { font-size: 2rem; }
-      .btn-submit { padding: 0.875rem 2rem; font-size: 1rem; }
-    }
-    @media (max-width: 576px) {
-      body { padding: 1rem 0; }
-      .card-header, .card-body { padding: 1.5rem 1rem; }
-      .calculation-summary li { padding: 0.75rem 1rem; flex-direction: column; align-items: flex-start; gap: 0.25rem; }
-      .total-summary { padding: 1.5rem; }
-    }
+
   </style>
 </head>
 <body>
-  <div class="main-container">
-    <noscript>
-      <div class="alert alert-warning" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        O cálculo automático requer JavaScript habilitado.
-      </div>
-    </noscript>
-    <div class="form-card" data-controller="proposta-form">
-      <div class="card-header">
-        <h2>
-          <i class="bi bi-file-earmark-plus"></i>
-          Nova Proposta
-        </h2>
-      </div>
-      <div class="card-body">
-        <% if @proposta.errors.any? %>
-          <div class="alert alert-danger-custom" role="alert">
-            <h6 class="alert-heading">
-              <i class="bi bi-exclamation-triangle-fill me-2"></i>
-              Atenção aos seguintes erros:
-            </h6>
-            <ul>
-              <% @proposta.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-        <%= form_with(model: @proposta, local: true, html: {autocomplete: "off"}) do |form| %>
-          <div class="row">
-            <div class="col-md-6 mb-4">
-              <%= form.label :revisao, class: "form-label" do %>
-                <i class="bi bi-arrow-repeat"></i> Revisão
-              <% end %>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-hash"></i></span>
-                <%= form.number_field :revisao, class: "form-control", min: 1, required: true, placeholder: "Ex: 1" %>
-              </div>
-            </div>
-          </div>
+  <div class="container py-5">
+    <%= form_with(model: @proposta, local: true, html: {autocomplete: "off", 'data-controller': 'proposta-form'}) do |form| %>
+      <div class="row g-5">
 
-          <hr class="section-divider">
+        <div class="col-lg-7">
+          <div class="form-section">
+            <h1 class="h2 mb-2 fw-bold">Nova Proposta</h1>
+            <p class="text-muted mb-5">Preencha os dados abaixo para gerar o cálculo da proposta.</p>
 
-          <div class="mb-4">
-            <h5 class="form-label">
-              <i class="bi bi-list-check"></i> Funções da Proposta
-            </h5>
-            <small class="text-muted">Selecione as funções e preencha os campos de horas previstas e valor/hora para cada.</small>
-            <div>
-              <% @funcoes.each_with_index do |funcao, idx| %>
-                <div class="card my-3 p-3">
-                  <div class="row align-items-center">
-                    <div class="col-md-4 mb-3 mb-md-0">
-                      <label class="form-label" for="funcao_<%= funcao.id %>">
-                        <i class="bi bi-person-gear"></i> <%= funcao.nome %>
-                      </label>
-                      <div class="input-group">
-                        <span class="input-group-text">
-                          <%= check_box_tag "proposta[proposta_funcoes_attributes][#{idx}][funcao_id]", funcao.id, false, id: "funcao_#{funcao.id}", class: "form-check-input" %>
-                        </span>
-                        <input type="text" class="form-control bg-light" value="Selecionar" disabled>
-                      </div>
-                    </div>
-                    <div class="col-md-4 mb-3 mb-md-0">
-                      <label class="form-label" for="horas_<%= funcao.id %>">
-                        <i class="bi bi-clock-history"></i> Horas Previstas
-                      </label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-clock"></i></span>
-                        <%= number_field_tag "proposta[proposta_funcoes_attributes][#{idx}][quantidade_horas]", nil, step: 0.5, min: 0, class: "form-control", placeholder: "Horas previstas", id: "horas_#{funcao.id}" %>
-                      </div>
-                    </div>
-                    <div class="col-md-4">
-                      <label class="form-label" for="valor_<%= funcao.id %>">
-                        <i class="bi bi-currency-dollar"></i> Valor/Hora
-                      </label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-cash"></i></span>
-                        <%= number_field_tag "proposta[proposta_funcoes_attributes][#{idx}][valor_hora]", funcao.valor_base, step: 0.01, min: 0, class: "form-control", placeholder: "Valor/hora", id: "valor_#{funcao.id}" %>
-                      </div>
-                    </div>
-                  </div>
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <%= form.label :revisao, class: "form-label" %>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-arrow-repeat"></i></span>
+                  <%= form.number_field :revisao, class: "form-control", min: 1, required: true, placeholder: "Revisão", 'data-action': 'input->proposta-form#update' %>
                 </div>
-              <% end %>
-            </div>
-          </div>
-
-          <hr class="section-divider">
-
-          <div class="row">
-            <div class="col-md-6 mb-4">
-              <%= form.label :margem_lucro, class: "form-label" do %>
-                <i class="bi bi-graph-up-arrow"></i> Margem Adicional
-              <% end %>
-              <div class="input-group">
-                <span class="input-group-text">%</span>
-                <%= form.number_field :margem_lucro, class: "form-control", step: 0.01, min: 0, max: 100, required: true, placeholder: "15.00" %>
+              </div>
+              <div class="col-md-6 mb-4">
+                <%= form.label :margem_lucro, "Margem Adicional (%)", class: "form-label" %>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-graph-up-arrow"></i></span>
+                  <%= form.number_field :margem_lucro, class: "form-control", step: 0.01, min: 0, required: true, placeholder: "15.00", 'data-proposta-form-target': 'margemLucro', 'data-action': 'input->proposta-form#update' %>
+                </div>
               </div>
             </div>
-          </div>
 
-          <hr class="section-divider">
+            <hr class="my-4">
 
-          <div class="calculation-section">
-            <h5 class="calculation-title">
-              <i class="bi bi-calculator-fill"></i>
-              Resumo da Proposta
-            </h5>
-            <ul class="calculation-summary">
-              <li>
-                <span>Valor Base (Horas × Valor/Hora)</span>
-                <strong data-proposta-form-target="valorBaseDisplay">R$ 0,00</strong>
-              </li>
-              <li>
-                <span>+ Margem Adicional</span>
-                <strong data-proposta-form-target="margemAdicionalDisplay">R$ 0,00</strong>
-              </li>
-            </ul>
-            <div class="total-summary" aria-live="polite">
-              <div class="total-label">
-                <i class="bi bi-cash-stack"></i>
-                Valor Total da Proposta
-              </div>
-              <div class="total-value" data-proposta-form-target="valorTotalDisplay">
-                R$ 0,00
-              </div>
+            <h5 class="section-title"><i class="bi bi-list-check"></i> Funções da Proposta</h5>
+            <div class="table-responsive">
+              <table class="table funcoes-table">
+                <tbody>
+                  <% @funcoes.each_with_index do |funcao, idx| %>
+                    <tr data-proposta-form-target="funcaoRow">
+                      <td class="ps-0">
+                        <div class="form-check form-switch">
+                          <%= check_box_tag "proposta[proposta_funcoes_attributes][#{idx}][funcao_id]", funcao.id, false,
+                              id: "funcao_#{funcao.id}",
+                              class: "form-check-input",
+                              'data-action': 'change->proposta-form#toggleRow' %>
+                        </div>
+                      </td>
+                      <td><label for="funcao_<%= funcao.id %>" class="fw-bold"><%= funcao.nome %></label></td>
+                      <td style="min-width: 130px;">
+                        <%= number_field_tag "proposta[proposta_funcoes_attributes][#{idx}][quantidade_horas]", nil,
+                            step: 0.5, min: 0, class: "form-control form-control-sm", placeholder: "Horas",
+                            disabled: true, 'data-action': 'input->proposta-form#update' %>
+                      </td>
+                      <td style="min-width: 140px;">
+                        <%= number_field_tag "proposta[proposta_funcoes_attributes][#{idx}][valor_hora]", funcao.valor_base,
+                            step: 0.01, min: 0, class: "form-control form-control-sm", placeholder: "Valor/h",
+                            disabled: true, 'data-action': 'input->proposta-form#update' %>
+                      </td>
+                      <td class="subtotal-cell">
+                          —
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
             </div>
-            <%= form.hidden_field :valor_total, data: { proposta_form_target: "valorTotalHidden" } %>
-          </div>
 
-          <div class="d-grid mt-4">
-            <%= form.submit "Criar Proposta", class: "btn btn-submit" %>
+            <div class="d-grid mt-5">
+              <%= form.submit "Criar Proposta", class: "btn btn-submit" %>
+            </div>
+
           </div>
-        <% end %>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="sticky-top" style="top: 2rem;">
+            <div class="summary-section">
+              <h5 class="section-title"><i class="bi bi-calculator"></i> Resumo da Proposta</h5>
+              <ul class="list-unstyled summary-list">
+                <li>
+                  <span>Valor Base</span>
+                  <strong data-proposta-form-target="valorBaseDisplay">R$ 0,00</strong>
+                </li>
+                <li>
+                  <span>Margem Adicional</span>
+                  <strong data-proposta-form-target="margemAdicionalDisplay">R$ 0,00</strong>
+                </li>
+              </ul>
+              <div class="total-summary" aria-live="polite">
+                <div class="total-label">Valor Total</div>
+                <div class="total-value" data-proposta-form-target="valorTotalDisplay">R$ 0,00</div>
+              </div>
+              <%= form.hidden_field :valor_total, data: { proposta_form_target: "valorTotalHidden" } %>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    <% end %>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 </body>

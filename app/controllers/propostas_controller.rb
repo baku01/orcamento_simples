@@ -1,7 +1,7 @@
 # typed: true
 # frozen_string_literal: true
 
-require 'sorbet-runtime'
+require "sorbet-runtime"
 
 class PropostasController < ApplicationController
   extend T::Sig

@@ -1,8 +1,8 @@
-# typed: true
+# typed: false
 # frozen_string_literal: true
 
-require 'sorbet-runtime'
-require 'rspec/sorbet'
+require "sorbet-runtime"
+require "rspec/sorbet"
 
 # Este arquivo foi gerado pelo comando `rails generate rspec:install`. Convencionalmente, todos
 # os testes ficam em um diretório `spec`, que o RSpec adiciona ao `$LOAD_PATH`.

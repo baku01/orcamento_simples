@@ -10,10 +10,34 @@ module GeneratedUrlHelpersModule
   include ::ActionDispatch::Routing::PolymorphicRoutes
 
   sig { params(args: T.untyped).returns(String) }
+  def edit_funco_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def edit_proposta_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def funco_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def funcoes_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def new_funco_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def new_proposta_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def new_rails_conductor_inbound_email_source_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
   def new_rails_conductor_inbound_email_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def proposta_url(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def propostas_url(*args); end
 
   sig { params(args: T.untyped).returns(String) }
   def rails_blob_representation_proxy_url(*args); end

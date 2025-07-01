@@ -1019,6 +1019,7 @@ class ActiveStorage::BaseController < ::ActionController::Base
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
 
   class << self
     private
@@ -1230,6 +1231,7 @@ class ActiveStorage::Blobs::ProxyController < ::ActiveStorage::BaseController
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
 
   class << self
     private
@@ -1249,6 +1251,7 @@ class ActiveStorage::Blobs::RedirectController < ::ActiveStorage::BaseController
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
 
   class << self
     private
@@ -1278,6 +1281,7 @@ class ActiveStorage::DirectUploadsController < ::ActiveStorage::BaseController
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
   def blob_args; end
   def direct_upload_json(blob); end
 
@@ -1302,6 +1306,7 @@ class ActiveStorage::DiskController < ::ActiveStorage::BaseController
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
   def acceptable_content?(token); end
   def decode_verified_key; end
   def decode_verified_token; end
@@ -1882,6 +1887,7 @@ class ActiveStorage::Representations::BaseController < ::ActiveStorage::BaseCont
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
   def blob_scope; end
   def set_representation; end
 
@@ -1906,6 +1912,7 @@ class ActiveStorage::Representations::ProxyController < ::ActiveStorage::Represe
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
 
   class << self
     private
@@ -1923,6 +1930,7 @@ class ActiveStorage::Representations::RedirectController < ::ActiveStorage::Repr
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
 
   class << self
     private

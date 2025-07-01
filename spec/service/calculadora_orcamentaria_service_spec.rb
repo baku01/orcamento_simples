@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "rails_helper"
-require "sorbet-runtime"
 
 VALOR_POR_HORA_EQP     = Float(25.85)
 TOTAL_DE_HORAS_EQP     = Float(10)

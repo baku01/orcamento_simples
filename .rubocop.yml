@@ -9,5 +9,35 @@
 #
 # See https://docs.rubocop.org/rubocop/configuration
 
+require:
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-rspec_rails
+  - rubocop-sorbet
+
 inherit_gem:
   rubocop-shopify: rubocop.yml
+
+AllCops:
+  TargetRubyVersion: 3.4
+  NewCops: enable
+  SuggestExtensions: true
+  Exclude:
+    - "vendor/**/*"
+    - "tmp/**/*"
+    - "bin/*"
+    - "db/schema.rb"
+    - "db/migrate/*.rb"
+    - "sorbet/**/*"
+    - "node_modules/**/*"
+
+Rspec/ContextWording:
+  Prefixes:
+    - quando
+    - com
+    - dado
+    - e
+    - mas
+    - deve
+    - para
+  Enabled: true

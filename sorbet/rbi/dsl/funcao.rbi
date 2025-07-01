@@ -6,6 +6,7 @@
 
 
 class Funcao
+  include GeneratedAssociationMethods
   include GeneratedAttributeMethods
   include EnumMethodsModule
   extend CommonRelationMethods
@@ -350,6 +351,8 @@ class Funcao
     sig { returns(T::Boolean) }
     def moi?; end
   end
+
+  module GeneratedAssociationMethods; end
 
   module GeneratedAssociationRelationMethods
     sig { returns(PrivateAssociationRelation) }

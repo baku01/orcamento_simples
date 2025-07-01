@@ -38,7 +38,7 @@ module ActionCable
   end
 end
 
-# source://actioncable//lib/action_cable/channel/test_case.rb#11
+# source://actioncable//lib/action_cable/channel/base.rb#9
 module ActionCable::Channel; end
 
 # # Action Cable Channel Base
@@ -1123,7 +1123,7 @@ module ActionCable::Channel::TestCase::Behavior::ClassMethods
   def tests(channel); end
 end
 
-# source://actioncable//lib/action_cable/connection/test_case.rb#13
+# source://actioncable//lib/action_cable/connection/identification.rb#6
 module ActionCable::Connection; end
 
 # source://actioncable//lib/action_cable/connection/test_case.rb#22

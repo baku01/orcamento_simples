@@ -10,10 +10,34 @@ module GeneratedPathHelpersModule
   include ::ActionDispatch::Routing::PolymorphicRoutes
 
   sig { params(args: T.untyped).returns(String) }
+  def edit_funco_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def edit_proposta_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def funco_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def funcoes_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def new_funco_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def new_proposta_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
   def new_rails_conductor_inbound_email_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
   def new_rails_conductor_inbound_email_source_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def proposta_path(*args); end
+
+  sig { params(args: T.untyped).returns(String) }
+  def propostas_path(*args); end
 
   sig { params(args: T.untyped).returns(String) }
   def rails_blob_path(*args); end

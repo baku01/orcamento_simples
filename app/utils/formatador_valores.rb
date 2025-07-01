@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-require 'sorbet-runtime'
+require "sorbet-runtime"
 
 # Converte um valor numérico (Float, Integer, String ou BigDecimal) para BigDecimal,
 # garantindo precisão em operações financeiras e monetárias.

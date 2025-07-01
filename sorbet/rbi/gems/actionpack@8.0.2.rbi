@@ -719,6 +719,9 @@ module AbstractController::Collector
   def ttf(*_arg0, **_arg1, &_arg2); end
 
   # source://actionpack//lib/abstract_controller/collector.rb#11
+  def turbo_stream(*_arg0, **_arg1, &_arg2); end
+
+  # source://actionpack//lib/abstract_controller/collector.rb#11
   def url_encoded_form(*_arg0, **_arg1, &_arg2); end
 
   # source://actionpack//lib/abstract_controller/collector.rb#11
@@ -1259,6 +1262,7 @@ class ActionController::API < ::ActionController::Metal
   include ::ActionController::Rescue
   include ::ActionController::Instrumentation
   include ::ActionController::ParamsWrapper
+  include ::Turbo::RequestIdTracking
   extend ::ActionView::ViewPaths::ClassMethods
   extend ::AbstractController::UrlFor::ClassMethods
   extend ::ActionController::Rendering::ClassMethods
@@ -1979,6 +1983,10 @@ class ActionController::Base < ::ActionController::Metal
   include ::ActionController::Rescue
   include ::ActionController::Instrumentation
   include ::ActionController::ParamsWrapper
+  include ::Turbo::Native::Navigation
+  include ::Turbo::Frames::FrameRequest
+  include ::Turbo::Streams::TurboStreamsTagBuilder
+  include ::Turbo::RequestIdTracking
   extend ::ActionView::ViewPaths::ClassMethods
   extend ::AbstractController::Helpers::Resolution
   extend ::AbstractController::Helpers::ClassMethods
@@ -2008,6 +2016,7 @@ class ActionController::Base < ::ActionController::Metal
   extend ::ActiveSupport::Rescuable::ClassMethods
   extend ::ActionController::Instrumentation::ClassMethods
   extend ::ActionController::ParamsWrapper::ClassMethods
+  extend ::Importmap::Freshness
 
   # source://actionpack//lib/action_controller/base.rb#291
   def __callbacks; end
@@ -2250,6 +2259,9 @@ class ActionController::Base < ::ActionController::Metal
 
   # source://actionpack//lib/action_controller/base.rb#277
   def _layout(lookup_context, formats, keys); end
+
+  # source://actionpack//lib/action_controller/base.rb#329
+  def _layout_from_proc; end
 
   # source://actionpack//lib/action_controller/base.rb#324
   def _protected_ivars; end
@@ -2643,6 +2655,18 @@ end
 
 # source://actionpack//lib/action_controller/base.rb#274
 module ActionController::Base::HelperMethods
+  include ::ActionText::ContentHelper
+  include ::ActionText::TagHelper
+  include ::Importmap::ImportmapTagsHelper
+  include ::Turbo::DriveHelper
+  include ::Turbo::FramesHelper
+  include ::Turbo::IncludesHelper
+  include ::Turbo::StreamsHelper
+  include ::ActionView::Helpers::CaptureHelper
+  include ::ActionView::Helpers::OutputSafetyHelper
+  include ::ActionView::Helpers::TagHelper
+  include ::Turbo::Streams::ActionHelper
+
   # source://actionpack//lib/action_controller/base.rb#289
   def alert(*_arg0, **_arg1, &_arg2); end
 
@@ -2661,11 +2685,23 @@ module ActionController::Base::HelperMethods
   # source://actionpack//lib/action_controller/base.rb#291
   def form_authenticity_token(*_arg0, **_arg1, &_arg2); end
 
+  # source://actionpack//lib/action_controller/base.rb#329
+  def hotwire_native_app?(*_arg0, **_arg1, &_arg2); end
+
   # source://actionpack//lib/action_controller/base.rb#289
   def notice(*_arg0, **_arg1, &_arg2); end
 
   # source://actionpack//lib/action_controller/base.rb#291
   def protect_against_forgery?(*_arg0, **_arg1, &_arg2); end
+
+  # source://actionpack//lib/action_controller/base.rb#329
+  def turbo_frame_request?(*_arg0, **_arg1, &_arg2); end
+
+  # source://actionpack//lib/action_controller/base.rb#329
+  def turbo_frame_request_id(*_arg0, **_arg1, &_arg2); end
+
+  # source://actionpack//lib/action_controller/base.rb#329
+  def turbo_native_app?(*_arg0, **_arg1, &_arg2); end
 
   # source://actionpack//lib/action_controller/base.rb#283
   def view_cache_dependencies(*_arg0, **_arg1, &_arg2); end
@@ -12837,6 +12873,7 @@ class ActionDispatch::IntegrationTest < ::ActiveSupport::TestCase
   include ::ActionDispatch::Routing::UrlFor
   include ::ActionDispatch::IntegrationTest::UrlOptions
   include ::ActionDispatch::Assertions::RoutingAssertions::WithIntegrationRouting
+  include ::Turbo::TestAssertions::IntegrationTestAssertions
   extend ::ActionDispatch::IntegrationTest::Behavior::ClassMethods
   extend ::ActionDispatch::Assertions::RoutingAssertions::WithIntegrationRouting::ClassMethods
 end
@@ -16137,6 +16174,12 @@ class ActionDispatch::RequestEncoder::IdentityEncoder
 
   # source://actionpack//lib/action_dispatch/testing/request_encoder.rb#13
   def response_parser; end
+end
+
+# source://actionpack//lib/action_dispatch/testing/integration.rb#671
+class ActionDispatch::RequestEncoder::TurboStreamEncoder < ::ActionDispatch::RequestEncoder::IdentityEncoder
+  # source://actionpack//lib/action_dispatch/testing/integration.rb#671
+  def accept_header; end
 end
 
 # # Action Dispatch RequestId
@@ -20692,7 +20735,6 @@ end
 # source://actionpack//lib/action_dispatch/system_test_case.rb#114
 class ActionDispatch::SystemTestCase < ::ActiveSupport::TestCase
   include ::Capybara::DSL
-  include ::Capybara::DSLRSpecProxyInstaller
   include ::Capybara::Minitest::Assertions
   include ::ActionDispatch::SystemTesting::TestHelpers::SetupAndTeardown
   include ::ActionDispatch::SystemTesting::TestHelpers::ScreenshotHelper
@@ -21243,6 +21285,11 @@ ActionPack::VERSION::STRING = T.let(T.unsafe(nil), String)
 
 # source://actionpack//lib/action_pack/gem_version.rb#14
 ActionPack::VERSION::TINY = T.let(T.unsafe(nil), Integer)
+
+module ActionView::RoutingUrlFor
+  include ::ActionDispatch::Routing::PolymorphicRoutes
+  include ::ActionDispatch::Routing::UrlFor
+end
 
 # source://actionpack//lib/action_dispatch/http/mime_type.rb#7
 module Mime

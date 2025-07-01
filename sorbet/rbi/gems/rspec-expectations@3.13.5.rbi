@@ -1450,7 +1450,6 @@ RSpec::Expectations::Version::STRING = T.let(T.unsafe(nil), String)
 # source://rspec-expectations//lib/rspec/matchers/english_phrasing.rb#2
 module RSpec::Matchers
   extend ::RSpec::Matchers::DSL
-  extend ::Capybara::RSpecMatcherProxyInstaller::ClassMethods
 
   # Applied to a proc, specifies that its execution will cause some value to
   # change.
@@ -7965,7 +7964,6 @@ class RSpec::Matchers::DSL::Matcher
   include ::RSpec::Matchers::BuiltIn::BaseMatcher::DefaultFailureMessages
   include ::RSpec::Matchers::DSL::DefaultImplementations
   include ::RSpec::Matchers
-  include ::Capybara::RSpecMatcherProxyInstaller
   include ::RSpec::Matchers::Composable
   extend ::RSpec::Matchers::DSL::Macros
   extend ::RSpec::Matchers::DSL::Macros::Deprecated

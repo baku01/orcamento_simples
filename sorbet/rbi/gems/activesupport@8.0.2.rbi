@@ -3952,15 +3952,6 @@ ActiveSupport::CurrentAttributes::INVALID_ATTRIBUTE_NAMES = T.let(T.unsafe(nil),
 # source://activesupport//lib/active_support/current_attributes.rb#98
 ActiveSupport::CurrentAttributes::NOT_SET = T.let(T.unsafe(nil), Object)
 
-# source://activesupport//lib/active_support/current_attributes/test_helper.rb#3
-module ActiveSupport::CurrentAttributes::TestHelper
-  # source://activesupport//lib/active_support/current_attributes/test_helper.rb#9
-  def after_teardown; end
-
-  # source://activesupport//lib/active_support/current_attributes/test_helper.rb#4
-  def before_setup; end
-end
-
 # Provides +deep_merge+ and +deep_merge!+ methods. Expects the including class
 # to provide a <tt>merge!(other, &block)</tt> method.
 #
@@ -6088,15 +6079,6 @@ module ActiveSupport::ExecutionContext
     # source://activesupport//lib/active_support/execution_context.rb#48
     def store; end
   end
-end
-
-# source://activesupport//lib/active_support/execution_context/test_helper.rb#3
-module ActiveSupport::ExecutionContext::TestHelper
-  # source://activesupport//lib/active_support/execution_context/test_helper.rb#9
-  def after_teardown; end
-
-  # source://activesupport//lib/active_support/execution_context/test_helper.rb#4
-  def before_setup; end
 end
 
 # source://activesupport//lib/active_support/execution_wrapper.rb#7
@@ -12515,6 +12497,7 @@ class ActiveSupport::TestCase < ::Minitest::Test
   include ::ActiveSupport::Testing::ConstantStubbing
   include ::ActiveSupport::Testing::TimeHelpers
   include ::ActiveSupport::Testing::FileFixtures
+  include ::Turbo::TestAssertions
   extend ::ActiveSupport::Callbacks::ClassMethods
   extend ::ActiveSupport::DescendantsTracker
   extend ::ActiveSupport::Testing::SetupAndTeardown::ClassMethods
@@ -12573,6 +12556,12 @@ class ActiveSupport::TestCase < ::Minitest::Test
 
   # source://activesupport//lib/active_support/test_case.rb#296
   def assert_not_same(exp, act, msg = T.unsafe(nil)); end
+
+  # source://activesupport//lib/active_support/test_case.rb#298
+  def dom_class(*_arg0, **_arg1, &_arg2); end
+
+  # source://activesupport//lib/active_support/test_case.rb#298
+  def dom_id(*_arg0, **_arg1, &_arg2); end
 
   # source://activesupport//lib/active_support/test_case.rb#152
   def file_fixture_path; end
@@ -12727,7 +12716,7 @@ end
 # source://activesupport//lib/active_support/test_case.rb#22
 ActiveSupport::TestCase::Assertion = Minitest::Assertion
 
-# source://activesupport//lib/active_support/testing/file_fixtures.rb#6
+# source://activesupport//lib/active_support/testing/tagged_logging.rb#4
 module ActiveSupport::Testing; end
 
 # source://activesupport//lib/active_support/testing/assertions.rb#7
@@ -20289,21 +20278,6 @@ class String
   # source://activesupport//lib/active_support/core_ext/string/inflections.rb#284
   def downcase_first; end
 
-  # source://activesupport//lib/active_support/core_ext/string/starts_ends_with.rb#5
-  def ends_with?(*_arg0); end
-
-  # The inverse of <tt>String#include?</tt>. Returns true if the string
-  # does not include the other string.
-  #
-  #   "hello".exclude? "lo" # => false
-  #   "hello".exclude? "ol" # => true
-  #   "hello".exclude? ?h   # => false
-  #
-  # @return [Boolean]
-  #
-  # source://activesupport//lib/active_support/core_ext/string/exclude.rb#10
-  def exclude?(string); end
-
   # Returns the first character. If a limit is supplied, returns a substring
   # from the beginning of the string until it reaches the limit value. If the
   # given limit is greater than or equal to the string length, returns a copy of self.
@@ -20385,45 +20359,6 @@ class String
   #
   # source://activesupport//lib/active_support/core_ext/string/zones.rb#9
   def in_time_zone(zone = T.unsafe(nil)); end
-
-  # Indents the lines in the receiver:
-  #
-  #   <<EOS.indent(2)
-  #   def some_method
-  #     some_code
-  #   end
-  #   EOS
-  #   # =>
-  #     def some_method
-  #       some_code
-  #     end
-  #
-  # The second argument, +indent_string+, specifies which indent string to
-  # use. The default is +nil+, which tells the method to make a guess by
-  # peeking at the first indented line, and fall back to a space if there is
-  # none.
-  #
-  #   "  foo".indent(2)        # => "    foo"
-  #   "foo\n\t\tbar".indent(2) # => "\t\tfoo\n\t\t\t\tbar"
-  #   "foo".indent(2, "\t")    # => "\t\tfoo"
-  #
-  # While +indent_string+ is typically one space or tab, it may be any string.
-  #
-  # The third argument, +indent_empty_lines+, is a flag that says whether
-  # empty lines should be indented. Default is false.
-  #
-  #   "foo\n\nbar".indent(2)            # => "  foo\n\n  bar"
-  #   "foo\n\nbar".indent(2, nil, true) # => "  foo\n  \n  bar"
-  #
-  # source://activesupport//lib/active_support/core_ext/string/indent.rb#42
-  def indent(amount, indent_string = T.unsafe(nil), indent_empty_lines = T.unsafe(nil)); end
-
-  # Same as +indent+, except it indents the receiver in-place.
-  #
-  # Returns the indented string, or +nil+ if there was nothing to indent.
-  #
-  # source://activesupport//lib/active_support/core_ext/string/indent.rb#7
-  def indent!(amount, indent_string = T.unsafe(nil), indent_empty_lines = T.unsafe(nil)); end
 
   # Wraps the current string in the ActiveSupport::StringInquirer class,
   # which gives you a prettier way to test for equality.
@@ -20637,9 +20572,6 @@ class String
   #
   # source://activesupport//lib/active_support/core_ext/string/filters.rb#21
   def squish!; end
-
-  # source://activesupport//lib/active_support/core_ext/string/starts_ends_with.rb#4
-  def starts_with?(*_arg0); end
 
   # Strips indentation in heredocs.
   #

@@ -5,22 +5,25 @@
 # Please instead update this file by running `bin/tapioca gem turbo-rails`.
 
 
-class ActionDispatch::IntegrationTest < ::ActiveSupport::TestCase
-  include ::ActionDispatch::Assertions::RoutingAssertions
-  include ::ActionDispatch::Assertions::ResponseAssertions
-  include ::Rails::Dom::Testing::Assertions::DomAssertions
-  include ::Rails::Dom::Testing::Assertions::SelectorAssertions
-  include ::Rails::Dom::Testing::Assertions
-  include ::ActionDispatch::Assertions
-  include ::ActionDispatch::Integration::Runner
-  include ::ActionController::TemplateAssertions
-  include ::ActionDispatch::TestHelpers::PageDumpHelper
+class ActionController::Base < ::ActionController::Metal
   include ::ActionDispatch::Routing::PolymorphicRoutes
-  include ::Turbo::TestAssertions::IntegrationTestAssertions
+  include ::ActionController::Head
+  include ::AbstractController::Caching::ConfigMethods
+  include ::ActionController::BasicImplicitRender
+  extend ::AbstractController::Helpers::Resolution
 end
 
-class ActiveSupport::TestCase < ::Minitest::Test
-  include ::Turbo::TestAssertions
+module ActionController::Base::HelperMethods
+  include ::ActionText::ContentHelper
+  include ::ActionText::TagHelper
+  include ::Turbo::DriveHelper
+  include ::Turbo::FramesHelper
+  include ::Turbo::IncludesHelper
+  include ::Turbo::StreamsHelper
+  include ::ActionView::Helpers::CaptureHelper
+  include ::ActionView::Helpers::OutputSafetyHelper
+  include ::ActionView::Helpers::TagHelper
+  include ::Turbo::Streams::ActionHelper
 end
 
 # source://turbo-rails//lib/turbo/engine.rb#3
@@ -364,6 +367,7 @@ class Turbo::Native::NavigationController < ::ActionController::Base
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
 
   class << self
     private

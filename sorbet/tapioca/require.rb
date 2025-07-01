@@ -1,10 +1,4 @@
 # typed: true
 # frozen_string_literal: true
 
-require 'active_support/core_ext/integer/time'
-require 'bootsnap/setup'
-require 'bundler/setup'
-require 'rails'
-require 'rails/all'
-require 'rspec/rails'
-require 'sorbet-runtime'
+# Add your extra requires here (`bin/tapioca require` can be used to bootstrap this list)

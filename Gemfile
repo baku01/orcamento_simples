@@ -51,8 +51,8 @@ group :development, :test do
   gem "observer", require: false
   gem "rspec", require: false
   gem "rspec-rails", require: false
-  gem "rspec-sorbet", require: false
-  gem "rspec-sorbet-types", require: false
+  # gem "rspec-sorbet", require: false
+  # gem "rspec-sorbet-types", require: false
 
   # === Factory para testes ===
   gem "factory_bot_rails", require: false
@@ -63,21 +63,22 @@ group :development, :test do
 
   # === Sorbet ===
   gem "sorbet", require: false
+  gem "sorbet-static-and-runtime"
   gem "sorbet-rails", require: false
-  gem "sorbet-result", require: false
-  gem "sorbet-static", require: false
+  # gem "sorbet-result", require: false
+  # gem "sorbet-static", require: false
 
   # === RuboCop (core + plugins) ===
   gem "rubocop", require: false
-  gem "rubocop-capybara", require: false
-  gem "rubocop-factory_bot", require: false
-  gem "rubocop-performance", require: false
+  # gem "rubocop-capybara", require: false
+  # gem "rubocop-factory_bot", require: false
+  # gem "rubocop-performance", require: false
   gem "rubocop-rails", require: false
   gem "rubocop-rspec", require: false
   gem "rubocop-rspec_rails", require: false
   gem "rubocop-shopify", require: false
   gem "rubocop-sorbet", require: false
-  gem "rubocop-thread_safety", require: false # Thread safety checks
+  # gem "rubocop-thread_safety", require: false # Thread safety checks
 
   # === Ruby LSP e suporte Rails ===
   gem "ruby-lsp", require: false

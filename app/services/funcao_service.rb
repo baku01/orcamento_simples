@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-require 'sorbet-runtime'
+require "sorbet-runtime"
 
 # Serviço para lidar com lógicas relacionadas à entidade {Funcao}.
 #
@@ -37,7 +37,7 @@ module FuncaoService
       sig { params(id: Integer).returns(Funcao) }
       def pega_funcao_por_id(id:)
         funcao = Funcao.find_by(id: id)
-        raise ActiveRecord::RecordNotFound, 'Função não encontrada' if funcao.nil?
+        raise ActiveRecord::RecordNotFound, "Função não encontrada" if funcao.nil?
 
         funcao
       end
@@ -50,9 +50,17 @@ module FuncaoService
       sig { params(funcao: Funcao).returns(BigDecimal) }
       def pega_valor_base(funcao)
         valor_base = funcao.valor_base
-        raise ActiveRecord::RecordNotFound, 'Valor base não encontrado' if valor_base.nil?
+        raise ActiveRecord::RecordNotFound, "Valor base não encontrado" if valor_base.nil?
 
         valor_base
+      end
+
+      # Retorna todas as instâncias de {Funcao} presentes no banco de dados.
+      #
+      # @return [Array<Funcao>] Lista de todas as funções cadastradas.
+      sig { returns(T::Array[Funcao]) }
+      def pega_todas_funcoes
+        Funcao.all.to_ary
       end
     end
   end

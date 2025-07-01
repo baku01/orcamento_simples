@@ -311,6 +311,7 @@ class ActionMailbox::BaseController < ::ActionController::Base
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
   def authenticate_by_password; end
   def ensure_configured; end
   def ingress_name; end
@@ -499,6 +500,7 @@ class ActionMailbox::Ingresses::Mailgun::InboundEmailsController < ::ActionMailb
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
   def authenticate; end
   def authenticated?; end
   def key; end
@@ -539,6 +541,7 @@ class ActionMailbox::Ingresses::Mandrill::InboundEmailsController < ::ActionMail
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
   def authenticate; end
   def authenticated?; end
   def events; end
@@ -577,6 +580,7 @@ class ActionMailbox::Ingresses::Postmark::InboundEmailsController < ::ActionMail
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
   def mail; end
 
   class << self
@@ -597,6 +601,7 @@ class ActionMailbox::Ingresses::Relay::InboundEmailsController < ::ActionMailbox
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
   def require_valid_rfc822_message; end
 
   class << self
@@ -617,6 +622,7 @@ class ActionMailbox::Ingresses::Sendgrid::InboundEmailsController < ::ActionMail
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
   def envelope; end
   def mail; end
 
@@ -974,6 +980,7 @@ class Rails::Conductor::BaseController < ::ActionController::Base
   private
 
   def _layout(lookup_context, formats, keys); end
+  def _layout_from_proc; end
   def ensure_development_env; end
 
   class << self

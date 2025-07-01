@@ -92,12 +92,54 @@
   <div class="discussion">
     <p>== CalculadoraOrcamentariaService</p>
 
-<p>Serviço responsável pelos cálculos de criação de propostas orçamentárias.</p>
+<p>Serviço centralizado responsável por todos os cálculos orçamentários do sistema.
+Implementa as fórmulas de negócio para propostas, incluindo cálculos de mão de obra,
+equipamentos, custos variáveis e margens de lucro.</p>
 
-<p>=== Exemplo de uso:
-  CalculadoraOrcamentariaService.taxa_de_variacao_funcao(BigDecimal(“100”), BigDecimal(“120”))
-  CalculadoraOrcamentariaService.valor_venda_mo(BigDecimal(“50”), BigDecimal(“100”), BigDecimal(“0.2”), 10)
-  CalculadoraOrcamentariaService.valor_venda_eqp(100.0, BigDecimal(“0.1”), BigDecimal(“0.2”), BigDecimal(“0.05”), 8)</p>
+<p>=== Responsabilidades
+* Calcular taxa de variação entre valores base
+* Determinar valor de venda de mão de obra (MOI/MOD)
+* Calcular valor de venda de equipamentos
+* Computar custos variáveis com margem de lucro</p>
+
+<p>=== Conceitos de Negócio
+* +Taxa de Variação+: Diferença relativa entre valor base e adicional
+* +Valor de Venda MO+: Preço final da mão de obra incluindo variações
+* +Valor de Venda EQP+: Preço final do equipamento com despesas e impostos
+* +Custos Variáveis+: Custos base acrescidos da margem de lucro</p>
+
+<p>=== Fórmulas Utilizadas
+* Taxa Variação: (valor_adicional - valor_base)
+* Venda MO: ((valor_hora * taxa_variacao) + valor_base) * horas
+* Venda EQP: (valor_hora * (despesa_indireta / (1 - (margem + imposto)))) * horas
+* Custos Variáveis: valor_custo * (1 + margem_lucro)</p>
+
+<p>=== Exemplos de uso
+  # Calcular taxa de variação de função
+  taxa = CalculadoraOrcamentariaService.taxa_de_variacao_funcao(
+    valor_base: BigDecimal(“100”),
+    valor_base_adicional: BigDecimal(“120”)
+  )
+  # =&gt; #&lt;BigDecimal “20.0”&gt;</p>
+
+<p># Calcular valor de venda de mão de obra
+  valor_mo = CalculadoraOrcamentariaService.valor_venda_mo(
+    valor_hora: BigDecimal(“50”),
+    valor_base: BigDecimal(“100”),
+    taxa_variacao: BigDecimal(“0.2”),
+    quantidade_horas: 10.0
+  )
+  # =&gt; #&lt;BigDecimal “1100.0”&gt;</p>
+
+<p># Calcular valor de venda de equipamento
+  valor_eqp = CalculadoraOrcamentariaService.valor_venda_eqp(
+    valor_hora: 150.0,
+    despesa_indireta: BigDecimal(“0.1”),
+    margem_lucro_fixa: BigDecimal(“0.15”),
+    imposto: BigDecimal(“0.08”),
+    quantidade_horas: 8.0
+  )
+  # =&gt; #&lt;BigDecimal “1567.01…”&gt;</p>
 
 
   </div>
@@ -137,7 +179,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Calcula o valor total dos custos variáveis de um serviço, considerando a margem de lucro.</p>
+    <span class="summary_desc"><div class='inline'><p>Calcula o valor total dos custos variáveis aplicando margem de lucro.</p>
 </div></span>
   
 </li>
@@ -160,7 +202,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Calcula a taxa de variação relativa entre dois valores.</p>
+    <span class="summary_desc"><div class='inline'><p>Calcula a diferença absoluta entre valor base e valor adicional de uma função.</p>
 </div></span>
   
 </li>
@@ -183,7 +225,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Calcula o valor de venda de equipamentos.</p>
+    <span class="summary_desc"><div class='inline'><p>Calcula o valor de venda de equipamentos incluindo despesas, impostos e margem.</p>
 </div></span>
   
 </li>
@@ -206,7 +248,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Calcula o valor de venda da mão de obra.</p>
+    <span class="summary_desc"><div class='inline'><p>Calcula o valor total de venda da mão de obra para uma proposta.</p>
 </div></span>
   
 </li>
@@ -233,7 +275,17 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Calcula o valor total dos custos variáveis de um serviço, considerando a margem de lucro.</p>
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Este método é útil para calcular preços de materiais, subcontratações, etc.</p>
+</div>
+  </div>
+
+<p>Calcula o valor total dos custos variáveis aplicando margem de lucro.</p>
+
+<p>Aplica uma margem percentual sobre o custo base para determinar o preço
+final de venda, seguindo a fórmula: custo_base * (1 + margem_lucro)</p>
 
 
   </div>
@@ -244,8 +296,26 @@
     <h4 class="tag_title">Examples:</h4>
     
       
-      <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_custos_variaveis'>custos_variaveis</span><span class='lparen'>(</span><span class='float'>100.0</span><span class='comma'>,</span> <span class='float'>0.2</span><span class='rparen'>)</span>
-<span class='comment'>#=&gt; 120.0</span></code></pre>
+        <h5 class="example_title"><div class='inline'><p>Calcular preço de venda de material</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_custo_material'>custo_material</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>1500.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>  <span class='comment'># Custo do material
+</span><span class='id identifier rubyid_margem'>margem</span> <span class='op'>=</span> <span class='float'>0.30</span>                           <span class='comment'># 30% de margem
+</span><span class='id identifier rubyid_preco_venda'>preco_venda</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_custos_variaveis'>custos_variaveis</span><span class='lparen'>(</span>
+  <span class='label'>valor_custo:</span> <span class='id identifier rubyid_custo_material'>custo_material</span><span class='comma'>,</span>
+  <span class='label'>margem_lucro:</span> <span class='id identifier rubyid_margem'>margem</span>
+<span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal &quot;1950.0&quot;&gt; (R$ 1.500 + 30% = R$ 1.950)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Calcular preço sem margem (margem = 0)</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_preco_custo'>preco_custo</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_custos_variaveis'>custos_variaveis</span><span class='lparen'>(</span>
+  <span class='label'>valor_custo:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>800.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='label'>margem_lucro:</span> <span class='float'>0.0</span>
+<span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal &quot;800.0&quot;&gt; (sem acréscimo)</span></code></pre>
     
   </div>
 <p class="tag_title">Parameters:</p>
@@ -261,7 +331,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Custo base do serviço.</p>
+        <div class='inline'><p>Custo base do serviço ou produto</p>
 </div>
       
     </li>
@@ -276,7 +346,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Percentual da margem de lucro a ser aplicada (ex: 0.2 para 20%).</p>
+        <div class='inline'><p>Percentual de margem de lucro (ex: 0.25 = 25%)</p>
 </div>
       
     </li>
@@ -294,7 +364,37 @@
       
       
         &mdash;
-        <div class='inline'><p>Soma do custo base com a margem de lucro aplicada.</p>
+        <div class='inline'><p>Valor final com margem de lucro aplicada</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se valor_custo for negativo ou zero</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se margem_lucro for negativa</p>
 </div>
       
     </li>
@@ -307,14 +407,20 @@
       <pre class="lines">
 
 
-108
-109
-110</pre>
+226
+227
+228
+229
+230
+231</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 108</span>
+      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 226</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_custos_variaveis'>custos_variaveis</span><span class='lparen'>(</span><span class='label'>valor_custo:</span><span class='comma'>,</span> <span class='label'>margem_lucro:</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Valor custo deve ser positivo</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_valor_custo'>valor_custo</span> <span class='op'>&lt;=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Margem de lucro não pode ser negativa</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_margem_lucro'>margem_lucro</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+
   <span class='id identifier rubyid_valor_custo'>valor_custo</span> <span class='op'>+</span> <span class='lparen'>(</span><span class='id identifier rubyid_valor_custo'>valor_custo</span> <span class='op'>*</span> <span class='id identifier rubyid_margem_lucro'>margem_lucro</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -333,7 +439,17 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Calcula a taxa de variação relativa entre dois valores.</p>
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Este método calcula diferença absoluta, não percentual</p>
+</div>
+  </div>
+
+<p>Calcula a diferença absoluta entre valor base e valor adicional de uma função.</p>
+
+<p>Determina a variação monetária aplicada sobre o valor base de uma função,
+utilizada posteriormente para calcular ajustes salariais e custos de mão de obra.</p>
 
 
   </div>
@@ -344,8 +460,16 @@
     <h4 class="tag_title">Examples:</h4>
     
       
-      <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_taxa_de_variacao_funcao'>taxa_de_variacao_funcao</span><span class='lparen'>(</span><span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>100</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>120</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span>
-<span class='comment'>#=&gt; 0.2</span></code></pre>
+        <h5 class="example_title"><div class='inline'><p>Calcular variação salarial</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_base'>base</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>5000.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>      <span class='comment'># Salário base
+</span><span class='id identifier rubyid_adicional'>adicional</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>6000.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='comment'># Salário com benefícios
+</span><span class='id identifier rubyid_variacao'>variacao</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_taxa_de_variacao_funcao'>taxa_de_variacao_funcao</span><span class='lparen'>(</span>
+  <span class='label'>valor_base:</span> <span class='id identifier rubyid_base'>base</span><span class='comma'>,</span>
+  <span class='label'>valor_base_adicional:</span> <span class='id identifier rubyid_adicional'>adicional</span>
+<span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal &quot;1000.0&quot;&gt; (R$ 1.000 de diferença)</span></code></pre>
     
   </div>
 <p class="tag_title">Parameters:</p>
@@ -361,7 +485,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Valor inicial (base) para o cálculo.</p>
+        <div class='inline'><p>Valor base original da função (salário base)</p>
 </div>
       
     </li>
@@ -376,7 +500,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Valor adicional para o cálculo.</p>
+        <div class='inline'><p>Valor adicional aplicado (ex: benefícios, adicionais)</p>
 </div>
       
     </li>
@@ -394,7 +518,24 @@
       
       
         &mdash;
-        <div class='inline'><p>Taxa de variação relativa (ex: 0.2 para 20% de aumento).</p>
+        <div class='inline'><p>Diferença absoluta entre os valores (sempre positiva se adicional &gt; base)</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se algum dos valores for negativo ou nulo</p>
 </div>
       
     </li>
@@ -407,12 +548,12 @@
       <pre class="lines">
 
 
-29
-30
-31</pre>
+87
+88
+89</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 87</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_taxa_de_variacao_funcao'>taxa_de_variacao_funcao</span><span class='lparen'>(</span><span class='label'>valor_base:</span><span class='comma'>,</span> <span class='label'>valor_base_adicional:</span><span class='rparen'>)</span>
   <span class='lparen'>(</span><span class='id identifier rubyid_valor_base_adicional'>valor_base_adicional</span> <span class='op'>-</span> <span class='id identifier rubyid_valor_base'>valor_base</span><span class='rparen'>)</span>
@@ -433,7 +574,23 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Calcula o valor de venda de equipamentos.</p>
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>A fórmula garante que despesas, margem e impostos sejam recuperados no preço final</p>
+</div>
+  </div>
+
+<p>Calcula o valor de venda de equipamentos incluindo despesas, impostos e margem.</p>
+
+<p>Aplica a fórmula complexa que considera:
+- Valor base por hora do equipamento
+- Despesas indiretas como percentual
+- Margem de lucro fixa
+- Impostos aplicáveis
+- Quantidade de horas de utilização</p>
+
+<p>Fórmula: valor_hora * (despesa_indireta / (1 - (margem_lucro_fixa + imposto))) * quantidade_horas</p>
 
 
   </div>
@@ -444,14 +601,17 @@
     <h4 class="tag_title">Examples:</h4>
     
       
-      <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_valor_venda_eqp'>valor_venda_eqp</span><span class='lparen'>(</span>
-  <span class='float'>100.0</span><span class='comma'>,</span>
-  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.1</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
-  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.2</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
-  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.05</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
-  <span class='int'>8</span>
-<span class='rparen'>)</span>
-<span class='comment'>#=&gt; 144.73684210526315</span></code></pre>
+        <h5 class="example_title"><div class='inline'><p>Calcular aluguel de escavadeira</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_valor_escavadeira'>valor_escavadeira</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_valor_venda_eqp'>valor_venda_eqp</span><span class='lparen'>(</span>
+  <span class='label'>valor_hora:</span> <span class='float'>200.0</span><span class='comma'>,</span>                      <span class='comment'># R$ 200/hora base
+</span>  <span class='label'>despesa_indireta:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.12</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>   <span class='comment'># 12% despesas indiretas
+</span>  <span class='label'>margem_lucro_fixa:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.18</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>  <span class='comment'># 18% margem de lucro
+</span>  <span class='label'>imposto:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.10</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>            <span class='comment'># 10% impostos
+</span>  <span class='label'>quantidade_horas:</span> <span class='float'>24.0</span>                  <span class='comment'># 3 dias de 8 horas
+</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal &quot;8640.0&quot;&gt; (aproximadamente)</span></code></pre>
     
   </div>
 <p class="tag_title">Parameters:</p>
@@ -467,7 +627,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Valor da hora do equipamento.</p>
+        <div class='inline'><p>Valor por hora do equipamento (custo direto)</p>
 </div>
       
     </li>
@@ -482,7 +642,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Percentual de despesa indireta.</p>
+        <div class='inline'><p>Percentual de despesas indiretas (ex: 0.1 = 10%)</p>
 </div>
       
     </li>
@@ -497,7 +657,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Percentual de margem de lucro.</p>
+        <div class='inline'><p>Percentual de margem de lucro (ex: 0.15 = 15%)</p>
 </div>
       
     </li>
@@ -512,7 +672,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Percentual de impostos.</p>
+        <div class='inline'><p>Percentual de impostos (ex: 0.08 = 8%)</p>
 </div>
       
     </li>
@@ -527,7 +687,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Quantidade de horas de uso do equipamento.</p>
+        <div class='inline'><p>Horas totais de utilização do equipamento</p>
 </div>
       
     </li>
@@ -545,7 +705,50 @@
       
       
         &mdash;
-        <div class='inline'><p>Valor de venda do equipamento.</p>
+        <div class='inline'><p>Valor final de venda do equipamento</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se a soma (margem_lucro_fixa + imposto) &gt;= 1.0</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se algum percentual for negativo</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se quantidade_horas for negativa ou zero</p>
 </div>
       
     </li>
@@ -558,18 +761,22 @@
       <pre class="lines">
 
 
-88
-89
-90
-91
-92
-93
-94
-95
-96</pre>
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 178</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_valor_venda_eqp'>valor_venda_eqp</span><span class='lparen'>(</span>
   <span class='label'>valor_hora:</span><span class='comma'>,</span>
@@ -578,7 +785,11 @@
   <span class='label'>imposto:</span><span class='comma'>,</span>
   <span class='label'>quantidade_horas:</span>
 <span class='rparen'>)</span>
-  <span class='lparen'>(</span><span class='id identifier rubyid_valor_hora'>valor_hora</span> <span class='op'>*</span> <span class='lparen'>(</span><span class='id identifier rubyid_despesa_indireta'>despesa_indireta</span> <span class='op'>/</span> <span class='lparen'>(</span><span class='int'>1</span> <span class='op'>-</span> <span class='lparen'>(</span><span class='id identifier rubyid_margem_lucro_fixa'>margem_lucro_fixa</span> <span class='op'>+</span> <span class='id identifier rubyid_imposto'>imposto</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>*</span> <span class='id identifier rubyid_quantidade_horas'>quantidade_horas</span>
+  <span class='comment'># Validação para evitar divisão por zero ou números negativos
+</span>  <span class='id identifier rubyid_denominador'>denominador</span> <span class='op'>=</span> <span class='int'>1</span> <span class='op'>-</span> <span class='lparen'>(</span><span class='id identifier rubyid_margem_lucro_fixa'>margem_lucro_fixa</span> <span class='op'>+</span> <span class='id identifier rubyid_imposto'>imposto</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Soma de margem e imposto não pode ser &gt;= 100%</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_denominador'>denominador</span> <span class='op'>&lt;=</span> <span class='int'>0</span>
+
+  <span class='lparen'>(</span><span class='id identifier rubyid_valor_hora'>valor_hora</span> <span class='op'>*</span> <span class='lparen'>(</span><span class='id identifier rubyid_despesa_indireta'>despesa_indireta</span> <span class='op'>/</span> <span class='id identifier rubyid_denominador'>denominador</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>*</span> <span class='id identifier rubyid_quantidade_horas'>quantidade_horas</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -596,7 +807,18 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Calcula o valor de venda da mão de obra.</p>
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>O valor_base geralmente representa custos fixos independentes da duração</p>
+</div>
+  </div>
+
+<p>Calcula o valor total de venda da mão de obra para uma proposta.</p>
+
+<p>Aplica a fórmula: ((valor_hora * taxa_variacao) + valor_base) * quantidade_horas
+Esta fórmula considera o valor base da função, ajusta pelo valor hora com variação
+e multiplica pela quantidade total de horas previstas.</p>
 
 
   </div>
@@ -607,13 +829,16 @@
     <h4 class="tag_title">Examples:</h4>
     
       
-      <pre class="example code"><code><span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_valor_venda_mo'>valor_venda_mo</span><span class='lparen'>(</span>
-  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>50</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
-  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>100</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
-  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.2</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
-  <span class='int'>10</span>
-<span class='rparen'>)</span>
-<span class='comment'>#=&gt; 600.0</span></code></pre>
+        <h5 class="example_title"><div class='inline'><p>Calcular custo de engenheiro sênior</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_valor_mo'>valor_mo</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_valor_venda_mo'>valor_venda_mo</span><span class='lparen'>(</span>
+  <span class='label'>valor_hora:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>120.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>    <span class='comment'># R$ 120/hora
+</span>  <span class='label'>valor_base:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2000.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>   <span class='comment'># Valor base mensal
+</span>  <span class='label'>taxa_variacao:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>500.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='comment'># Variação calculada
+</span>  <span class='label'>quantidade_horas:</span> <span class='float'>40.0</span>               <span class='comment'># 40 horas no projeto
+</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal &quot;6800.0&quot;&gt; ((120 * 500) + 2000) * 40 / 160</span></code></pre>
     
   </div>
 <p class="tag_title">Parameters:</p>
@@ -629,7 +854,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Valor da hora de trabalho.</p>
+        <div class='inline'><p>Valor por hora da função específica</p>
 </div>
       
     </li>
@@ -644,7 +869,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Valor base inicial.</p>
+        <div class='inline'><p>Valor base fixo da função (independente de horas)</p>
 </div>
       
     </li>
@@ -659,7 +884,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Taxa de variação a ser aplicada.</p>
+        <div class='inline'><p>Taxa de variação calculada para a função</p>
 </div>
       
     </li>
@@ -674,7 +899,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Quantidade de horas trabalhadas.</p>
+        <div class='inline'><p>Total de horas previstas para esta função na proposta</p>
 </div>
       
     </li>
@@ -692,7 +917,37 @@
       
       
         &mdash;
-        <div class='inline'><p>Valor total de venda da mão de obra.</p>
+        <div class='inline'><p>Valor total de venda da mão de obra</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se quantidade_horas for negativa ou zero</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se algum valor monetário for negativo</p>
 </div>
       
     </li>
@@ -705,12 +960,12 @@
       <pre class="lines">
 
 
-57
-58
-59</pre>
+128
+129
+130</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'app/services/calculadora_orcamentaria_service.rb', line 128</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_valor_venda_mo'>valor_venda_mo</span><span class='lparen'>(</span><span class='label'>valor_hora:</span><span class='comma'>,</span> <span class='label'>valor_base:</span><span class='comma'>,</span> <span class='label'>taxa_variacao:</span><span class='comma'>,</span> <span class='label'>quantidade_horas:</span><span class='rparen'>)</span>
   <span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_valor_hora'>valor_hora</span> <span class='op'>*</span> <span class='id identifier rubyid_taxa_variacao'>taxa_variacao</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='id identifier rubyid_valor_base'>valor_base</span><span class='rparen'>)</span> <span class='op'>*</span> <span class='id identifier rubyid_quantidade_horas'>quantidade_horas</span>
@@ -725,7 +980,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Jun 30 10:44:40 2025 by
+  Generated on Tue Jul  1 09:43:29 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.4.4).
 </div>

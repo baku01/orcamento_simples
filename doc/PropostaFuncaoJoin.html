@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: PropostaFuncaoJoin
+  
+    &mdash; Documentation by YARD 0.9.37
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "PropostaFuncaoJoin";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (P)</a> &raquo;
+    
+    
+    <span class="title">PropostaFuncaoJoin</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: PropostaFuncaoJoin
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">ActiveRecord::Base</li>
+          
+            <li class="next"><span class='object_link'><a href="ApplicationRecord.html" title="ApplicationRecord (class)">ApplicationRecord</a></span></li>
+          
+            <li class="next">PropostaFuncaoJoin</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  <dl>
+      <dt>Extended by:</dt>
+      <dd>T::Sig</dd>
+  </dl>
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>app/models/proposta_funcao_join.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>== PropostaFuncaoJoin</p>
+
+<p>Tabela de associação entre Proposta e Funcao, armazenando informações específicas
+da utilização de cada função em uma proposta particular.</p>
+
+<p>Esta classe implementa o padrão “Rich Join Table”, onde além da associação
+many-to-many, são armazenados dados específicos da relação como valor por hora
+negociado e horas previstas para a função na proposta.</p>
+
+<p>=== Schema Information
+Table name: proposta_funcao_joins (assumed)</p>
+
+<p>proposta_id     :integer  not null, foreign key
+ funcao_id       :integer  not null, foreign key
+ valor_hora      :decimal  not null, &gt; 0
+ horas_previstas :decimal  not null, &gt; 0</p>
+
+<p>=== Validações
+* +valor_hora+ deve estar presente e ser maior que zero
+* +horas_previstas+ deve estar presente e ser maior que zero</p>
+
+<p>=== Relacionamentos
+* +belongs_to+ :proposta - proposta à qual esta associação pertence
+* +belongs_to+ :funcao - função utilizada na proposta</p>
+
+<p>=== Conceitos de Negócio
+* +valor_hora+: Valor por hora específico para esta função nesta proposta
+* +horas_previstas+: Quantidade de horas estimadas para esta função na proposta</p>
+
+<p>=== Exemplos de uso
+  # Associar uma função a uma proposta com valores específicos
+  proposta_funcao = PropostaFuncaoJoin.new(
+    proposta: proposta,
+    funcao: funcao_engenheiro,
+    valor_hora: 95.00,
+    horas_previstas: 40.0
+  )
+  proposta_funcao.save</p>
+
+<p># Calcular valor total desta função na proposta
+  valor_total = proposta_funcao.valor_hora * proposta_funcao.horas_previstas
+  # =&gt; #&lt;BigDecimal “3800.0”&gt;</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+
+  
+  
+  
+  
+
+</div>
+
+      <div id="footer">
+  Generated on Tue Jul  1 09:43:29 2025 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.37 (ruby-3.4.4).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -126,12 +126,14 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#new-instance_method" title="#new (instance method)">#<strong>new</strong>  </a>
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>  </a>
     
 
     
   </span>
   
+  
+    <span class="note title constructor">constructor</span>
   
   
   
@@ -153,16 +155,13 @@
   
   
   
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
   
-
-  <div id="instance_method_details" class="method_details_list">
-    <h2>Instance Method Details</h2>
-
-    
-      <div class="method_details first">
-  <h3 class="signature first" id="new-instance_method">
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
   
-    #<strong>new</strong>  
+    #<strong>initialize</strong>  
   
 
   
@@ -170,7 +169,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p class="note returns_void">This method returns an undefined value.</p>
+    
 
 
   </div>
@@ -186,25 +185,32 @@
 
 10
 11
-12</pre>
+12
+13
+14
+15</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/propostas_controller.rb', line 10</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_new'>new</span>
-  <span class='ivar'>@proposta</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Proposta.html" title="Proposta (class)">Proposta</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span>
+  <span class='kw'>super</span>
+  <span class='ivar'>@proposta</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Proposta.html" title="Proposta (class)">Proposta</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="Proposta.html" title="Proposta (class)">Proposta</a></span></span><span class='rparen'>)</span>
+  <span class='ivar'>@funcoes</span> <span class='op'>=</span> <span class='const'>T</span><span class='period'>.</span><span class='id identifier rubyid_let'>let</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="FuncaoService.html" title="FuncaoService (module)">FuncaoService</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="FuncaoService/BancoDeDados.html" title="FuncaoService::BancoDeDados (module)">BancoDeDados</a></span></span><span class='period'>.</span><span class='id identifier rubyid_pega_todas_funcoes'><span class='object_link'><a href="FuncaoService/BancoDeDados.html#pega_todas_funcoes-class_method" title="FuncaoService::BancoDeDados.pega_todas_funcoes (method)">pega_todas_funcoes</a></span></span><span class='comma'>,</span> <span class='const'>T</span><span class='op'>::</span><span class='const'>Array</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="Funcao.html" title="Funcao (class)">Funcao</a></span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_ordenar_funcoes'>ordenar_funcoes</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
 </table>
 </div>
-    
-  </div>
+  
+</div>
+
 
 </div>
 
       <div id="footer">
-  Generated on Mon Jun 30 10:44:40 2025 by
+  Generated on Tue Jul  1 09:43:29 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.4.4).
 </div>

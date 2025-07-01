@@ -90,9 +90,44 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Módulo responsável por operações relacionadas ao salário.</p>
+    <p>== SalarioService</p>
 
-<p>SalarioService fornece métodos para calcular variações e aumentos salariais.</p>
+<p>Serviço especializado em cálculos relacionados a salários e variações salariais.
+Fornece métodos utilitários para determinar aumentos, reduções e variações
+percentuais em valores monetários relacionados à folha de pagamento.</p>
+
+<p>=== Responsabilidades
+* Calcular taxas de variação entre valores salariais
+* Converter variações para percentuais
+* Fornecer base para análises de reajustes salariais
+* Validar consistência de cálculos monetários</p>
+
+<p>=== Conceitos de Negócio
+* +Taxa de Variação+: Relação proporcional entre valor original e aumento
+* +Variação Percentual+: Taxa expressa em percentual (multiplicada por 100)
+* +Valor Base+: Salário ou valor original antes do reajuste
+* +Valor Aumento+: Montante adicional aplicado ao valor base</p>
+
+<p>=== Fórmulas Utilizadas
+* Taxa Variação = valor_aumento / valor_base
+* Percentual = taxa_variacao * 100</p>
+
+<p>=== Casos de Uso
+* Calcular percentual de aumento salarial
+* Analisar impacto de reajustes na folha
+* Determinar variações para cálculos orçamentários
+* Comparar diferentes cenários de remuneração</p>
+
+<p>=== Exemplos de uso
+  # Calcular aumento de 15% sobre salário base
+  base = BigDecimal(“5000.00”)
+  aumento = BigDecimal(“750.00”)
+  taxa = SalarioService.calcular_taxa_variacao(base, aumento)
+  # =&gt; #&lt;BigDecimal “0.15”&gt;</p>
+
+<p># Converter para percentual
+  percentual = SalarioService.calcular_taxa_variacao_porcentagem(base, aumento)
+  # =&gt; #&lt;BigDecimal “15.0”&gt;</p>
 
 
   </div>
@@ -132,7 +167,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Calcula a taxa de variação percentual entre o valor_base e o valor_aumento.</p>
+    <span class="summary_desc"><div class='inline'><p>Calcula a taxa de variação proporcional entre valor base e aumento.</p>
 </div></span>
   
 </li>
@@ -155,7 +190,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Calcula a taxa de variação percentual entre o valor_base e o valor_aumento.</p>
+    <span class="summary_desc"><div class='inline'><p>Calcula a taxa de variação expressa como percentual.</p>
 </div></span>
   
 </li>
@@ -182,13 +217,56 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Calcula a taxa de variação percentual entre o valor_base e o valor_aumento.</p>
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>O resultado é uma proporção, não um percentual direto</p>
+</div>
+  </div>
+
+<p>Calcula a taxa de variação proporcional entre valor base e aumento.</p>
+
+<p>Determina qual fração do valor base representa o aumento aplicado,
+resultando em um valor decimal que pode ser interpretado como percentual
+quando multiplicado por 100.</p>
 
 
   </div>
 </div>
 <div class="tags">
-  <p class="tag_title">Parameters:</p>
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Calcular aumento salarial</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_salario_base'>salario_base</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>4000.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_aumento_aplicado'>aumento_aplicado</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>600.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>  <span class='comment'># R$ 600 de aumento
+</span><span class='id identifier rubyid_taxa'>taxa</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="SalarioService (module)">SalarioService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_calcular_taxa_variacao'>calcular_taxa_variacao</span><span class='lparen'>(</span><span class='id identifier rubyid_salario_base'>salario_base</span><span class='comma'>,</span> <span class='id identifier rubyid_aumento_aplicado'>aumento_aplicado</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal &quot;0.15&quot;&gt; (15% de aumento)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Calcular redução salarial</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_salario_atual'>salario_atual</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>5000.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_reducao'>reducao</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-500.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>  <span class='comment'># Redução de R$ 500
+</span><span class='id identifier rubyid_taxa'>taxa</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="SalarioService (module)">SalarioService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_calcular_taxa_variacao'>calcular_taxa_variacao</span><span class='lparen'>(</span><span class='id identifier rubyid_salario_atual'>salario_atual</span><span class='comma'>,</span> <span class='id identifier rubyid_reducao'>reducao</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal &quot;-0.1&quot;&gt; (-10% de redução)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Sem alteração</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_base'>base</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>3000.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_sem_aumento'>sem_aumento</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_taxa'>taxa</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="SalarioService (module)">SalarioService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_calcular_taxa_variacao'>calcular_taxa_variacao</span><span class='lparen'>(</span><span class='id identifier rubyid_base'>base</span><span class='comma'>,</span> <span class='id identifier rubyid_sem_aumento'>sem_aumento</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal &quot;0.0&quot;&gt; (0% de variação)</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
 <ul class="param">
   
     <li>
@@ -201,7 +279,7 @@
       
       
         &mdash;
-        <div class='inline'><p>O valor original do salário.</p>
+        <div class='inline'><p>Valor original (salário base, valor inicial)</p>
 </div>
       
     </li>
@@ -216,7 +294,7 @@
       
       
         &mdash;
-        <div class='inline'><p>O valor do aumento aplicado.</p>
+        <div class='inline'><p>Valor do aumento aplicado (não o valor final)</p>
 </div>
       
     </li>
@@ -234,7 +312,37 @@
       
       
         &mdash;
-        <div class='inline'><p>A variação percentual.</p>
+        <div class='inline'><p>Taxa de variação como decimal (ex: 0.15 = 15% de aumento)</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se valor_base for zero ou negativo</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se valor_aumento for negativo</p>
 </div>
       
     </li>
@@ -247,14 +355,18 @@
       <pre class="lines">
 
 
-20
-21
-22</pre>
+86
+87
+88
+89
+90</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/salario_service.rb', line 20</span>
+      <pre class="code"><span class="info file"># File 'app/services/salario_service.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_calcular_taxa_variacao'>calcular_taxa_variacao</span><span class='lparen'>(</span><span class='id identifier rubyid_valor_base'>valor_base</span><span class='comma'>,</span> <span class='id identifier rubyid_valor_aumento'>valor_aumento</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Valor base deve ser positivo</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_valor_base'>valor_base</span> <span class='op'>&lt;=</span> <span class='int'>0</span>
+
   <span class='id identifier rubyid_valor_aumento'>valor_aumento</span> <span class='op'>/</span> <span class='id identifier rubyid_valor_base'>valor_base</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -273,13 +385,57 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Calcula a taxa de variação percentual entre o valor_base e o valor_aumento.</p>
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Este método é um wrapper conveniente para apresentação de dados</p>
+</div>
+  </div>
+
+<p>Calcula a taxa de variação expressa como percentual.</p>
+
+<p>Converte o resultado do cálculo de taxa de variação para formato
+percentual, multiplicando por 100 para facilitar interpretação
+e apresentação em interfaces de usuário.</p>
 
 
   </div>
 </div>
 <div class="tags">
-  <p class="tag_title">Parameters:</p>
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Mostrar percentual de aumento para usuário</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_base'>base</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2500.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_aumento'>aumento</span> <span class='op'>=</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>375.00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>  <span class='comment'># R$ 375 de aumento
+</span><span class='id identifier rubyid_percentual'>percentual</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="SalarioService (module)">SalarioService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_calcular_taxa_variacao_porcentagem'>calcular_taxa_variacao_porcentagem</span><span class='lparen'>(</span><span class='id identifier rubyid_base'>base</span><span class='comma'>,</span> <span class='id identifier rubyid_aumento'>aumento</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal &quot;15.0&quot;&gt;
+</span><span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Aumento de </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_percentual'>percentual</span><span class='embexpr_end'>}</span><span class='tstring_content'>%</span><span class='tstring_end'>&quot;</span></span>  <span class='comment'># &quot;Aumento de 15.0%&quot;</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Comparar múltiplos cenários</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_cenarios'>cenarios</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+  <span class='lbrace'>{</span> <span class='label'>base:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>3000</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>aumento:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>300</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>   <span class='comment'># 10%
+</span>  <span class='lbrace'>{</span> <span class='label'>base:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>3000</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>aumento:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>450</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>   <span class='comment'># 15%
+</span>  <span class='lbrace'>{</span> <span class='label'>base:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>3000</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>aumento:</span> <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>600</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>    <span class='comment'># 20%
+</span><span class='rbracket'>]</span>
+
+<span class='id identifier rubyid_cenarios'>cenarios</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_cenario'>cenario</span><span class='comma'>,</span> <span class='id identifier rubyid_i'>i</span><span class='op'>|</span>
+  <span class='id identifier rubyid_percentual'>percentual</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="SalarioService (module)">SalarioService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_calcular_taxa_variacao_porcentagem'>calcular_taxa_variacao_porcentagem</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_cenario'>cenario</span><span class='lbracket'>[</span><span class='symbol'>:base</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_cenario'>cenario</span><span class='lbracket'>[</span><span class='symbol'>:aumento</span><span class='rbracket'>]</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Cenário </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_i'>i</span><span class='op'>+</span><span class='int'>1</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_percentual'>percentual</span><span class='embexpr_end'>}</span><span class='tstring_content'>% de aumento</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
 <ul class="param">
   
     <li>
@@ -292,7 +448,7 @@
       
       
         &mdash;
-        <div class='inline'><p>O valor original do salário.</p>
+        <div class='inline'><p>Valor original (salário base, valor inicial)</p>
 </div>
       
     </li>
@@ -307,7 +463,7 @@
       
       
         &mdash;
-        <div class='inline'><p>O valor do aumento aplicado.</p>
+        <div class='inline'><p>Valor do aumento aplicado</p>
 </div>
       
     </li>
@@ -325,7 +481,24 @@
       
       
         &mdash;
-        <div class='inline'><p>A variação percentual.</p>
+        <div class='inline'><p>Taxa de variação em percentual (ex: 15.0 = 15%)</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se valor_base for zero ou negativo (herdado do método base)</p>
 </div>
       
     </li>
@@ -338,12 +511,12 @@
       <pre class="lines">
 
 
-30
-31
-32</pre>
+130
+131
+132</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/salario_service.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'app/services/salario_service.rb', line 130</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_calcular_taxa_variacao_porcentagem'>calcular_taxa_variacao_porcentagem</span><span class='lparen'>(</span><span class='id identifier rubyid_valor_base'>valor_base</span><span class='comma'>,</span> <span class='id identifier rubyid_valor_aumento'>valor_aumento</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_calcular_taxa_variacao'>calcular_taxa_variacao</span><span class='lparen'>(</span><span class='id identifier rubyid_valor_base'>valor_base</span><span class='comma'>,</span> <span class='id identifier rubyid_valor_aumento'>valor_aumento</span><span class='rparen'>)</span> <span class='op'>*</span> <span class='int'>100</span>
@@ -358,7 +531,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Jun 30 10:44:40 2025 by
+  Generated on Tue Jul  1 09:43:29 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.4.4).
 </div>

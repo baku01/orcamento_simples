@@ -90,32 +90,44 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Módulo responsável por interações com o banco de dados relacionadas à entidade <span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span>.</p>
+    <p>== BancoDeDados</p>
 
-<p>Este módulo contém métodos utilitários para buscar funções e seus valores base no banco de dados.</p>
+<p>Módulo responsável por todas as operações de persistência relacionadas
+à entidade Funcao. Centraliza queries, validações de existência e
+tratamento de erros de banco de dados.</p>
+
+<p>=== Responsabilidades
+* Executar queries seguras com tratamento de erros
+* Validar existência de registros antes de retornar
+* Fornecer mensagens de erro consistentes
+* Abstrair complexidade de ActiveRecord</p>
+
+<p>=== Tratamento de Erros
+* +ActiveRecord::RecordNotFound+: Quando registros não existem
+* Validações de nulidade para campos obrigatórios
+* Mensagens de erro padronizadas</p>
+
+<p>=== Exemplos de uso
+  # Buscar com tratamento de erro
+  begin
+    funcao = FuncaoService::BancoDeDados.pega_funcao_por_id(id: 999)
+  rescue ActiveRecord::RecordNotFound =&gt; e
+    puts e.message # =&gt; “Função não encontrada”
+  end</p>
+
+<p># Obter valor base com validação
+  funcao = Funcao.new(nome: “Teste”, tipo: :moi) # sem valor_base
+  begin
+    valor = FuncaoService::BancoDeDados.pega_valor_base(funcao)
+  rescue ActiveRecord::RecordNotFound =&gt; e
+    puts e.message # =&gt; “Valor base não encontrado”
+  end</p>
 
 
   </div>
 </div>
 <div class="tags">
   
-  <div class="examples">
-    <h4 class="tag_title">Examples:</h4>
-    
-      
-        <h5 class="example_title"><div class='inline'><p>Buscar uma função por ID</p>
-</div></h5>
-      
-      <pre class="example code"><code><span class='id identifier rubyid_funcao'>funcao</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../FuncaoService.html" title="FuncaoService (module)">FuncaoService</a></span></span><span class='op'>::</span><span class='const'>BancoDeDados</span><span class='period'>.</span><span class='id identifier rubyid_pega_funcao_por_id'><span class='object_link'><a href="#pega_funcao_por_id-class_method" title="FuncaoService::BancoDeDados.pega_funcao_por_id (method)">pega_funcao_por_id</a></span></span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span></code></pre>
-    
-      
-        <h5 class="example_title"><div class='inline'><p>Buscar o valor base de uma função</p>
-</div></h5>
-      
-      <pre class="example code"><code><span class='id identifier rubyid_valor_base'>valor_base</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../FuncaoService.html" title="FuncaoService (module)">FuncaoService</a></span></span><span class='op'>::</span><span class='const'>BancoDeDados</span><span class='period'>.</span><span class='id identifier rubyid_pega_valor_base'><span class='object_link'><a href="#pega_valor_base-class_method" title="FuncaoService::BancoDeDados.pega_valor_base (method)">pega_valor_base</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_funcao'>funcao</span><span class='rparen'>)</span></code></pre>
-    
-  </div>
-
 
 </div>
 
@@ -149,7 +161,30 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Busca uma instância de <span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span> pelo seu ID.</p>
+    <span class="summary_desc"><div class='inline'><p>Busca uma função específica pelo seu identificador único.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pega_todas_funcoes-class_method" title="pega_todas_funcoes (class method)">.<strong>pega_todas_funcoes</strong>  &#x21d2; Array&lt;Funcao&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Recupera todas as funções cadastradas no sistema.</p>
 </div></span>
   
 </li>
@@ -172,7 +207,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Retorna o valor base associado a uma instância de <span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span>.</p>
+    <span class="summary_desc"><div class='inline'><p>Extrai o valor base de uma função com validação de nulidade.</p>
 </div></span>
   
 </li>
@@ -199,13 +234,45 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Busca uma instância de <span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span> pelo seu ID.</p>
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Prefira este método ao invés de Funcao.find para melhor tratamento de erros</p>
+</div>
+  </div>
+
+<p>Busca uma função específica pelo seu identificador único.</p>
+
+<p>Realiza busca segura no banco de dados com tratamento adequado
+para casos onde o registro não existe, evitando exceptions não tratadas.</p>
 
 
   </div>
 </div>
 <div class="tags">
-  <p class="tag_title">Parameters:</p>
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Buscar função existente</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_funcao'>funcao</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../FuncaoService.html" title="FuncaoService (module)">FuncaoService</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="FuncaoService::BancoDeDados (module)">BancoDeDados</a></span></span><span class='period'>.</span><span class='id identifier rubyid_pega_funcao_por_id'>pega_funcao_por_id</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='int'>1</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_funcao'>funcao</span><span class='period'>.</span><span class='id identifier rubyid_nome'>nome</span> <span class='comment'># =&gt; &quot;ENGENHEIRO SENIOR&quot;</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Tratar função inexistente</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='kw'>begin</span>
+  <span class='id identifier rubyid_funcao'>funcao</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../FuncaoService.html" title="FuncaoService (module)">FuncaoService</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="FuncaoService::BancoDeDados (module)">BancoDeDados</a></span></span><span class='period'>.</span><span class='id identifier rubyid_pega_funcao_por_id'>pega_funcao_por_id</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='int'>999</span><span class='rparen'>)</span>
+<span class='kw'>rescue</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>RecordNotFound</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Função não encontrada, redirecionando para listagem...</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
 <ul class="param">
   
     <li>
@@ -218,7 +285,7 @@
       
       
         &mdash;
-        <div class='inline'><p>O ID da função a ser buscada.</p>
+        <div class='inline'><p>Identificador único da função no banco de dados</p>
 </div>
       
     </li>
@@ -236,7 +303,7 @@
       
       
         &mdash;
-        <div class='inline'><p>A função encontrada.</p>
+        <div class='inline'><p>Instância da função encontrada</p>
 </div>
       
     </li>
@@ -253,7 +320,20 @@
       
       
         &mdash;
-        <div class='inline'><p>Se nenhuma função for encontrada com o ID fornecido.</p>
+        <div class='inline'><p>Quando nenhuma função é encontrada com o ID fornecido</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se o ID for nulo, negativo ou não numérico</p>
 </div>
       
     </li>
@@ -266,21 +346,115 @@
       <pre class="lines">
 
 
-38
-39
-40
-41
-42
-43</pre>
+102
+103
+104
+105
+106
+107
+108
+109</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/funcao_service.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'app/services/funcao_service.rb', line 102</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_pega_funcao_por_id'>pega_funcao_por_id</span><span class='lparen'>(</span><span class='label'>id:</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID deve ser um número positivo</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_id'>id</span> <span class='op'>&lt;=</span> <span class='int'>0</span>
+
   <span class='id identifier rubyid_funcao'>funcao</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_by'>find_by</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>RecordNotFound</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Função não encontrada</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_funcao'>funcao</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>RecordNotFound</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Função não encontrada</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_funcao'>funcao</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
 
   <span class='id identifier rubyid_funcao'>funcao</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pega_todas_funcoes-class_method">
+  
+    .<strong>pega_todas_funcoes</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Para grandes volumes de dados, considere implementar paginação</p>
+</div>
+  </div>
+
+<p>Recupera todas as funções cadastradas no sistema.</p>
+
+<p>Carrega todas as instâncias de Funcao do banco de dados, convertendo
+para Array para facilitar manipulação e evitar lazy loading issues.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Listar todas as funções</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_funcoes'>funcoes</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../FuncaoService.html" title="FuncaoService (module)">FuncaoService</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="FuncaoService::BancoDeDados (module)">BancoDeDados</a></span></span><span class='period'>.</span><span class='id identifier rubyid_pega_todas_funcoes'>pega_todas_funcoes</span>
+<span class='id identifier rubyid_funcoes'>funcoes</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span> <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_nome'>nome</span><span class='embexpr_end'>}</span><span class='tstring_content'> - </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_f'>f</span><span class='period'>.</span><span class='id identifier rubyid_tipo'>tipo</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Verificar se existem funções cadastradas</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_funcoes'>funcoes</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../FuncaoService.html" title="FuncaoService (module)">FuncaoService</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="FuncaoService::BancoDeDados (module)">BancoDeDados</a></span></span><span class='period'>.</span><span class='id identifier rubyid_pega_todas_funcoes'>pega_todas_funcoes</span>
+<span class='kw'>if</span> <span class='id identifier rubyid_funcoes'>funcoes</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Nenhuma função cadastrada</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>else</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_funcoes'>funcoes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> funções encontradas</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Lista de todas as funções cadastradas (pode ser vazia)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+133
+134
+135</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/services/funcao_service.rb', line 133</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pega_todas_funcoes'>pega_todas_funcoes</span>
+  <span class='const'><span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span></span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span><span class='period'>.</span><span class='id identifier rubyid_to_ary'>to_ary</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -298,13 +472,48 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Retorna o valor base associado a uma instância de <span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span>.</p>
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Este método é preferível ao acesso direto para garantir validação</p>
+</div>
+  </div>
+
+<p>Extrai o valor base de uma função com validação de nulidade.</p>
+
+<p>Acessa o campo valor_base de uma instância de Funcao, garantindo
+que o valor existe e é válido antes de retornar. Essencial para
+evitar erros em cálculos posteriores.</p>
 
 
   </div>
 </div>
 <div class="tags">
-  <p class="tag_title">Parameters:</p>
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Obter valor base para cálculos</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_funcao'>funcao</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_valor_base'>valor_base</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../FuncaoService.html" title="FuncaoService (module)">FuncaoService</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="FuncaoService::BancoDeDados (module)">BancoDeDados</a></span></span><span class='period'>.</span><span class='id identifier rubyid_pega_valor_base'>pega_valor_base</span><span class='lparen'>(</span><span class='id identifier rubyid_funcao'>funcao</span><span class='rparen'>)</span>
+<span class='comment'># Usar valor_base em cálculos orçamentários...</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Validar função antes de usar valor</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_funcao'>funcao</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Funcao.html" title="Funcao (class)">Funcao</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>nome:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Teste</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='comment'># sem valor_base definido
+</span><span class='kw'>begin</span>
+  <span class='id identifier rubyid_valor'>valor</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../FuncaoService.html" title="FuncaoService (module)">FuncaoService</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="FuncaoService::BancoDeDados (module)">BancoDeDados</a></span></span><span class='period'>.</span><span class='id identifier rubyid_pega_valor_base'>pega_valor_base</span><span class='lparen'>(</span><span class='id identifier rubyid_funcao'>funcao</span><span class='rparen'>)</span>
+<span class='kw'>rescue</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>RecordNotFound</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Função incompleta, valor base não definido</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
 <ul class="param">
   
     <li>
@@ -317,7 +526,7 @@
       
       
         &mdash;
-        <div class='inline'><p>A função da qual se deseja obter o valor base.</p>
+        <div class='inline'><p>Instância da função da qual extrair o valor base</p>
 </div>
       
     </li>
@@ -335,7 +544,7 @@
       
       
         &mdash;
-        <div class='inline'><p>O valor base da função.</p>
+        <div class='inline'><p>Valor base da função</p>
 </div>
       
     </li>
@@ -352,7 +561,20 @@
       
       
         &mdash;
-        <div class='inline'><p>Se o valor base não estiver definido para a função.</p>
+        <div class='inline'><p>Se o valor base for nulo ou não definido</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se a função fornecida for nula</p>
 </div>
       
     </li>
@@ -365,19 +587,23 @@
       <pre class="lines">
 
 
-51
-52
-53
-54
-55
-56</pre>
+168
+169
+170
+171
+172
+173
+174
+175</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/services/funcao_service.rb', line 51</span>
+      <pre class="code"><span class="info file"># File 'app/services/funcao_service.rb', line 168</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_pega_valor_base'>pega_valor_base</span><span class='lparen'>(</span><span class='id identifier rubyid_funcao'>funcao</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_valor_base'>valor_base</span> <span class='op'>=</span> <span class='id identifier rubyid_funcao'>funcao</span><span class='period'>.</span><span class='id identifier rubyid_valor_base'>valor_base</span>
-  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>RecordNotFound</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Valor base não encontrado</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_valor_base'>valor_base</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Função não pode ser nula</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_funcao'>funcao</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ActiveRecord</span><span class='op'>::</span><span class='const'>RecordNotFound</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Valor base não encontrado</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_valor_base'>valor_base</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
 
   <span class='id identifier rubyid_valor_base'>valor_base</span>
 <span class='kw'>end</span></pre>
@@ -391,7 +617,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Jun 30 10:44:40 2025 by
+  Generated on Tue Jul  1 09:43:29 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.4.4).
 </div>

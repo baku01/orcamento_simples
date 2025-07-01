@@ -110,18 +110,60 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>== Schema Information</p>
+    <p>== Proposta</p>
 
-<p>Table name: propostas</p>
+<p>Representa uma proposta orçamentária completa, incluindo funções, equipamentos,
+valores calculados e informações de controle como revisão e identificação única.</p>
+
+<p>=== Schema Information
+Table name: propostas</p>
 
 <p>id                :integer not null, unique
  revisao           :integer not null
- quantidade_horas  :decimal not null
- despesa_indireta  :decimal not null
- margem_lucro_fixa :decimal not null
- margem_lucro      :decimal not null
- valor_total       :decimal not null
- valor_hora        :decimal not null</p>
+ quantidade_horas  :decimal not null, &gt; 0
+ despesa_indireta  :decimal not null, &gt; 0
+ margem_lucro_fixa :decimal not null, &gt; 0
+ margem_lucro      :decimal not null, &gt; 0
+ valor_total       :decimal not null, &gt; 0
+ valor_hora        :decimal not null, &gt; 0</p>
+
+<p>=== Validações
+* +id+ deve ser único, presente e um número inteiro
+* +revisao+ deve estar presente e ser um número inteiro
+* +quantidade_horas+ deve estar presente e ser maior que zero
+* +despesa_indireta+ deve estar presente e ser maior que zero
+* +margem_lucro_fixa+ deve estar presente e ser maior que zero
+* +margem_lucro+ deve estar presente e ser maior que zero
+* +valor_total+ deve estar presente e ser maior que zero
+* +valor_hora+ deve estar presente e ser maior que zero</p>
+
+<p>=== Relacionamentos
+* +has_many+ :proposta_funcoes - associações com funções
+* +has_many+ :funcoes, through: :proposta_funcoes - funções utilizadas na proposta
+* +has_many+ :proposta_equipamentos - associações com equipamentos
+* +has_many+ :equipamentos, through: :proposta_equipamentos - equipamentos utilizados</p>
+
+<p>=== Conceitos de Negócio
+* +despesa_indireta+: Custos que não estão diretamente ligados à execução (ex: administração)
+* +margem_lucro_fixa+: Percentual de lucro aplicado sobre os custos
+* +margem_lucro+: Valor absoluto de lucro calculado
+* +valor_hora+: Valor médio por hora da proposta
+* +revisao+: Controle de versões da proposta</p>
+
+<p>=== Exemplos de uso
+  # Criar uma nova proposta
+  proposta = Proposta.new(
+    id: 2024001,
+    quantidade_horas: 160.0,
+    despesa_indireta: 5000.00,
+    margem_lucro_fixa: 0.15,
+    margem_lucro: 2250.00,
+    valor_total: 17250.00,
+    valor_hora: 107.81
+  )</p>
+
+<p># Buscar valor base de uma função específica
+  valor_base = proposta.pega_valor_base(funcao_id)</p>
 
 
   </div>
@@ -161,7 +203,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Pega valor base da funcao.</p>
+    <span class="summary_desc"><div class='inline'><p>Recupera o valor base de uma função específica utilizada na proposta.</p>
 </div></span>
   
 </li>
@@ -191,13 +233,36 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Pega valor base da funcao</p>
+    <p>Recupera o valor base de uma função específica utilizada na proposta.</p>
+
+<p>Busca a função pelo ID fornecido e retorna seu valor base, que é utilizado
+como referência para cálculos orçamentários.</p>
 
 
   </div>
 </div>
 <div class="tags">
-  <p class="tag_title">Parameters:</p>
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Obter valor base de uma função</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_proposta'>proposta</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="Proposta (class)">Proposta</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_valor_base'>valor_base</span> <span class='op'>=</span> <span class='id identifier rubyid_proposta'>proposta</span><span class='period'>.</span><span class='id identifier rubyid_pega_valor_base'>pega_valor_base</span><span class='lparen'>(</span><span class='int'>5</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal:0x... &quot;80.0&quot;&gt;</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Tratamento de erro para função inexistente</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_proposta'>proposta</span><span class='period'>.</span><span class='id identifier rubyid_pega_valor_base'>pega_valor_base</span><span class='lparen'>(</span><span class='int'>999</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; ArgumentError: Função com id 999 não encontrada.</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
 <ul class="param">
   
     <li>
@@ -208,6 +273,10 @@
         <span class='type'>(<tt>Integer</tt>)</span>
       
       
+      
+        &mdash;
+        <div class='inline'><p>ID da função a ser consultada</p>
+</div>
       
     </li>
   
@@ -223,6 +292,10 @@
       
       
       
+        &mdash;
+        <div class='inline'><p>Valor base da função</p>
+</div>
+      
     </li>
   
 </ul>
@@ -236,6 +309,10 @@
       
       
       
+        &mdash;
+        <div class='inline'><p>Se a função não for encontrada ou se o valor base for nulo</p>
+</div>
+      
     </li>
   
 </ul>
@@ -246,18 +323,18 @@
       <pre class="lines">
 
 
-39
-40
-41
-42
-43
-44
-45
-46
-47</pre>
+105
+106
+107
+108
+109
+110
+111
+112
+113</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/proposta.rb', line 39</span>
+      <pre class="code"><span class="info file"># File 'app/models/proposta.rb', line 105</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_pega_valor_base'>pega_valor_base</span><span class='lparen'>(</span><span class='id identifier rubyid_id_funcao'>id_funcao</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_funcao'>funcao</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Funcao.html" title="Funcao (class)">Funcao</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find_by'>find_by</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='id identifier rubyid_id_funcao'>id_funcao</span><span class='rparen'>)</span>
@@ -278,7 +355,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Jun 30 10:44:40 2025 by
+  Generated on Tue Jul  1 09:43:29 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.4.4).
 </div>

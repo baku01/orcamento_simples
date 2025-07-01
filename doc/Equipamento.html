@@ -110,14 +110,36 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>== Schema Information</p>
+    <p>== Equipamento</p>
 
-<p>Table name: equipamentos</p>
+<p>Representa um equipamento utilizado em orçamentos de projetos.
+Cada equipamento possui um nome único e um valor por hora de utilização.</p>
 
-<p>nome        :string     not null
- valor_hora  :decimal    not null</p>
+<p>=== Schema Information
+Table name: equipamentos</p>
 
-<p>Model que representa um equipamento orçamentário.</p>
+<p>nome        :string     not null, max 50 chars
+ valor_hora  :decimal    not null, &gt; 0</p>
+
+<p>=== Validações
+* +nome+ deve estar presente e ter no máximo 50 caracteres
+* +valor_hora+ deve estar presente e ser maior que zero</p>
+
+<p>=== Relacionamentos
+* Pode estar associado a múltiplas propostas através de proposta_equipamentos</p>
+
+<p>=== Exemplos de uso
+  # Criar um novo equipamento
+  equipamento = Equipamento.new(nome: “Escavadeira”, valor_hora: 150.00)
+  equipamento.save</p>
+
+<p># Calcular valor de venda
+  valor = equipamento.pega_valor_venda(
+    quantidade_horas: 8.0,
+    despesa_indireta: BigDecimal(“100.0”),
+    margem_lucro_fixa: BigDecimal(“0.1”),
+    imposto: BigDecimal(“0.10”)
+  )</p>
 
 
   </div>
@@ -157,7 +179,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Calcula o valor de venda do equipamento usando o serviço CalculadoraOrcamentariaService.</p>
+    <span class="summary_desc"><div class='inline'><p>Calcula o valor de venda do equipamento para uma proposta específica.</p>
 </div></span>
   
 </li>
@@ -187,7 +209,10 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Calcula o valor de venda do equipamento usando o serviço CalculadoraOrcamentariaService.</p>
+    <p>Calcula o valor de venda do equipamento para uma proposta específica.</p>
+
+<p>Utiliza o serviço CalculadoraOrcamentariaService para aplicar despesas indiretas,
+margem de lucro e impostos sobre o valor base por hora do equipamento.</p>
 
 
   </div>
@@ -198,7 +223,17 @@
     <h4 class="tag_title">Examples:</h4>
     
       
-      <pre class="example code"><code>equipamento.pega_valor_venda(10,0, BigDecimal(&quot;100.0&quot;), BigDecimal(&quot;0.1), BigDecimal(&quot;0.10&quot;))</code></pre>
+        <h5 class="example_title"><div class='inline'><p>Calcular valor para 8 horas de uso</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_equipamento'>equipamento</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="Equipamento (class)">Equipamento</a></span></span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_valor'>valor</span> <span class='op'>=</span> <span class='id identifier rubyid_equipamento'>equipamento</span><span class='period'>.</span><span class='id identifier rubyid_pega_valor_venda'>pega_valor_venda</span><span class='lparen'>(</span>
+  <span class='float'>8.0</span><span class='comma'>,</span>
+  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>500.0</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.15</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='const'>BigDecimal</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>0.12</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='rparen'>)</span>
+<span class='comment'># =&gt; #&lt;BigDecimal:0x... &quot;1392.0&quot;&gt;</span></code></pre>
     
   </div>
 <p class="tag_title">Parameters:</p>
@@ -214,7 +249,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Quantidade de horas de uso do equipamento</p>
+        <div class='inline'><p>Número de horas que o equipamento será utilizado</p>
 </div>
       
     </li>
@@ -229,7 +264,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Valor das despesas indiretas</p>
+        <div class='inline'><p>Valor total das despesas indiretas do projeto</p>
 </div>
       
     </li>
@@ -244,7 +279,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Margem de lucro fixa</p>
+        <div class='inline'><p>Percentual de margem de lucro (ex: 0.1 para 10%)</p>
 </div>
       
     </li>
@@ -259,7 +294,7 @@
       
       
         &mdash;
-        <div class='inline'><p>Valor do imposto</p>
+        <div class='inline'><p>Percentual de imposto aplicado (ex: 0.10 para 10%)</p>
 </div>
       
     </li>
@@ -277,7 +312,24 @@
       
       
         &mdash;
-        <div class='inline'><p>Valor de venda calculado</p>
+        <div class='inline'><p>Valor de venda calculado para o equipamento</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Se algum parâmetro for inválido ou negativo</p>
 </div>
       
     </li>
@@ -290,18 +342,18 @@
       <pre class="lines">
 
 
-38
-39
-40
-41
-42
-43
-44
-45
-46</pre>
+78
+79
+80
+81
+82
+83
+84
+85
+86</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/equipamento.rb', line 38</span>
+      <pre class="code"><span class="info file"># File 'app/models/equipamento.rb', line 78</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_pega_valor_venda'>pega_valor_venda</span><span class='lparen'>(</span><span class='id identifier rubyid_quantidade_horas'>quantidade_horas</span><span class='comma'>,</span> <span class='id identifier rubyid_despesa_indireta'>despesa_indireta</span><span class='comma'>,</span> <span class='id identifier rubyid_margem_lucro_fixa'>margem_lucro_fixa</span><span class='comma'>,</span> <span class='id identifier rubyid_imposto'>imposto</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="CalculadoraOrcamentariaService.html" title="CalculadoraOrcamentariaService (module)">CalculadoraOrcamentariaService</a></span></span><span class='period'>.</span><span class='id identifier rubyid_valor_venda_eqp'><span class='object_link'><a href="CalculadoraOrcamentariaService.html#valor_venda_eqp-class_method" title="CalculadoraOrcamentariaService.valor_venda_eqp (method)">valor_venda_eqp</a></span></span><span class='lparen'>(</span>
@@ -322,7 +374,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Jun 30 10:44:40 2025 by
+  Generated on Tue Jul  1 09:43:29 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.4.4).
 </div>

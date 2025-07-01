@@ -85,33 +85,41 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Serviço para lidar com lógicas relacionadas à entidade <span class='object_link'><a href="Funcao.html" title="Funcao (class)">Funcao</a></span>.</p>
+    <p>== FuncaoService</p>
 
-<p>Este módulo centraliza operações utilitárias e de negócio referentes à entidade <span class='object_link'><a href="Funcao.html" title="Funcao (class)">Funcao</a></span>,
-facilitando a manutenção e reutilização de código relacionado a funções do sistema.</p>
+<p>Serviço centralizado para operações de negócio relacionadas à entidade Funcao.
+Fornece uma camada de abstração entre controllers e modelos, centralizando
+a lógica de busca, validação e manipulação de funções orçamentárias.</p>
+
+<p>=== Responsabilidades
+* Buscar funções por diferentes critérios
+* Validar existência e integridade de dados
+* Fornecer interface consistente para operações com funções
+* Centralizar tratamento de erros relacionados a funções</p>
+
+<p>=== Módulos Internos
+* +BancoDeDados+: Operações diretas com persistência de dados</p>
+
+<p>=== Padrões Utilizados
+* Service Object Pattern
+* Module Organization Pattern
+* Error Handling Centralization</p>
+
+<p>=== Exemplos de uso
+  # Buscar função específica
+  funcao = FuncaoService::BancoDeDados.pega_funcao_por_id(id: 1)</p>
+
+<p># Obter valor base de forma segura
+  valor = FuncaoService::BancoDeDados.pega_valor_base(funcao)</p>
+
+<p># Listar todas as funções
+  funcoes = FuncaoService::BancoDeDados.pega_todas_funcoes</p>
 
 
   </div>
 </div>
 <div class="tags">
   
-  <div class="examples">
-    <h4 class="tag_title">Examples:</h4>
-    
-      
-        <h5 class="example_title"><div class='inline'><p>Buscar uma função por ID</p>
-</div></h5>
-      
-      <pre class="example code"><code><span class='id identifier rubyid_funcao'>funcao</span> <span class='op'>=</span> <span class='const'>FuncaoService</span><span class='period'>.</span><span class='id identifier rubyid_pega_funcao_por_id'>pega_funcao_por_id</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span></code></pre>
-    
-      
-        <h5 class="example_title"><div class='inline'><p>Buscar o valor base de uma função</p>
-</div></h5>
-      
-      <pre class="example code"><code><span class='id identifier rubyid_valor_base'>valor_base</span> <span class='op'>=</span> <span class='const'>FuncaoService</span><span class='period'>.</span><span class='id identifier rubyid_pega_valor_base'>pega_valor_base</span><span class='lparen'>(</span><span class='id identifier rubyid_funcao'>funcao</span><span class='rparen'>)</span></code></pre>
-    
-  </div>
-
 
 </div><h2>Defined Under Namespace</h2>
 <p class="children">
@@ -135,7 +143,7 @@ facilitando a manutenção e reutilização de código relacionado a funções d
 </div>
 
       <div id="footer">
-  Generated on Mon Jun 30 10:44:40 2025 by
+  Generated on Tue Jul  1 09:43:29 2025 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.37 (ruby-3.4.4).
 </div>

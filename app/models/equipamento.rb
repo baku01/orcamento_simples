@@ -1,32 +1,72 @@
 # typed: strict
 # frozen_string_literal: true
 
-require 'sorbet-runtime'
+require "sorbet-runtime"
 
-# == Schema Information
+# == Equipamento
 #
+# Representa um equipamento utilizado em orçamentos de projetos.
+# Cada equipamento possui um nome único e um valor por hora de utilização.
+#
+# === Schema Information
 # Table name: equipamentos
 #
-#  nome        :string     not null
-#  valor_hora  :decimal    not null
+#  nome        :string     not null, max 50 chars
+#  valor_hora  :decimal    not null, > 0
 #
-# Model que representa um equipamento orçamentário.
+# === Validações
+# * +nome+ deve estar presente e ter no máximo 50 caracteres
+# * +valor_hora+ deve estar presente e ser maior que zero
+#
+# === Relacionamentos
+# * Pode estar associado a múltiplas propostas através de proposta_equipamentos
+#
+# === Exemplos de uso
+#   # Criar um novo equipamento
+#   equipamento = Equipamento.new(nome: "Escavadeira", valor_hora: 150.00)
+#   equipamento.save
+#
+#   # Calcular valor de venda
+#   valor = equipamento.pega_valor_venda(
+#     quantidade_horas: 8.0,
+#     despesa_indireta: BigDecimal("100.0"),
+#     margem_lucro_fixa: BigDecimal("0.1"),
+#     imposto: BigDecimal("0.10")
+#   )
 #
 class Equipamento < ApplicationRecord
   extend T::Sig
+
+  # === Validações
   validates :nome, presence: true, length: { maximum: 50 }
   validates :valor_hora, presence: true, numericality: { greater_than: 0 }
 
-  # Calcula o valor de venda do equipamento usando o serviço CalculadoraOrcamentariaService.
+  # === Métodos Públicos
+
+  # Calcula o valor de venda do equipamento para uma proposta específica.
   #
-  # @param quantidade_horas [Float] Quantidade de horas de uso do equipamento
-  # @param despesa_indireta [BigDecimal] Valor das despesas indiretas
-  # @param margem_lucro_fixa [BigDecimal] Margem de lucro fixa
-  # @param imposto [BigDecimal] Valor do imposto
-  # @return [BigDecimal] Valor de venda calculado
+  # Utiliza o serviço CalculadoraOrcamentariaService para aplicar despesas indiretas,
+  # margem de lucro e impostos sobre o valor base por hora do equipamento.
   #
-  # @example
-  #   equipamento.pega_valor_venda(10,0, BigDecimal("100.0"), BigDecimal("0.1), BigDecimal("0.10"))
+  # @param quantidade_horas [Float] Número de horas que o equipamento será utilizado
+  # @param despesa_indireta [BigDecimal] Valor total das despesas indiretas do projeto
+  # @param margem_lucro_fixa [BigDecimal] Percentual de margem de lucro (ex: 0.1 para 10%)
+  # @param imposto [BigDecimal] Percentual de imposto aplicado (ex: 0.10 para 10%)
+  #
+  # @return [BigDecimal] Valor de venda calculado para o equipamento
+  #
+  # @raise [ArgumentError] Se algum parâmetro for inválido ou negativo
+  #
+  # @example Calcular valor para 8 horas de uso
+  #   equipamento = Equipamento.find(1)
+  #   valor = equipamento.pega_valor_venda(
+  #     8.0,
+  #     BigDecimal("500.0"),
+  #     BigDecimal("0.15"),
+  #     BigDecimal("0.12")
+  #   )
+  #   # => #<BigDecimal:0x... "1392.0">
+  #
   sig do
     params(
       quantidade_horas: Float,

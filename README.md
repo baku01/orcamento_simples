@@ -4,8 +4,8 @@
 
 ### Propostas/new
 
-- Número de revisão atumático
-- Valor da hora precisa ser atríbuido a cada funçõao escolhida
+- Número de revisão automático
+- Valor da hora precisa ser atribuído a cada função escolhida
 - Despesa indireta não deve aparecer
 - Margem fixa não deve aparecer
 - Horas previstas deve ser colocado para cada função adicionada

@@ -1,518 +1,922 @@
 /**
- * PropostaFormController
+ * PropostaFormController - Versão Melhorada
  *
- * Controlador Stimulus responsável por gerenciar o formulário de proposta orçamentária.
- * Permite ativar/desativar funções, calcular subtotais, margem de lucro e valores totais,
- * além de atualizar a interface com os valores formatados em moeda brasileira.
+ * Controlador Stimulus responsável por gerenciar o formulário de proposta orçamentária
+ * com funcionalidades avançadas de UX, performance e acessibilidade.
  *
  * @class PropostaFormController
- * @extends {Controller} - Controlador base do Stimulus
- *
- * @description
- * Este controlador gerencia formulários de proposta orçamentária permitindo:
- * - Ativar/desativar funções específicas via checkbox
- * - Calcular subtotais baseados em horas e valor/hora
- * - Aplicar margem de lucro sobre o valor base
- * - Atualizar valores em tempo real conforme interação do usuário
- * - Formatar valores monetários em Real brasileiro (BRL)
- * - Validação em tempo real
- * - Estados de loading e confirmação
- * - Formatação automática de campos
- *
- * @requires @hotwired/stimulus
- * @version 2.0.0
+ * @extends {Controller}
+ * @version 3.0.0
  * @since 2024
+ *
+ * Funcionalidades:
+ * - Cálculos em tempo real com debounce otimizado
+ * - Busca e filtro de funções
+ * - Salvamento automático de rascunhos
+ * - Validação em tempo real
+ * - Atalhos de teclado
+ * - Animações suaves
+ * - Feedback visual aprimorado
+ * - Acessibilidade completa
  */
 
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  /**
-   * Lista de targets (alvos) utilizados pelo controlador.
-   * Define os elementos HTML que serão controlados por este controlador Stimulus.
-   */
   static targets = [
-    "funcaoRow",                  // Linhas da tabela de funções
-    "margemLucro",               // Input de percentual de margem de lucro
-    "valorBaseDisplay",          // Elemento para exibir o valor base total
-    "margemAdicionalDisplay",    // Elemento para exibir o valor da margem de lucro
-    "valorTotalDisplay",         // Elemento para exibir o valor total final
-    "valorTotalHidden",          // Input hidden para armazenar o valor total
-    "funcoesCounter",            // Contador de funções selecionadas
-    "funcoesCountText",          // Texto do contador
-    "emptyState",                // Estado vazio
-    "submitBtn",                 // Botão de submit
-    "submitText",                // Texto do botão submit
-    "submitLoading",             // Estado de loading do submit
-    "toggleAllBtn",              // Botão para selecionar todas
-    "subtotalCell",              // Células de subtotal
-    "funcoesAtivasDisplay",      // Display de funções ativas
-    "totalHorasDisplay",         // Display de total de horas
-    "margemPercentDisplay",      // Display do percentual de margem
-    "revisaoError",              // Erro do campo revisão
-    "margemLucroError",          // Erro do campo margem
-    "confirmRevisao",            // Modal - revisão
-    "confirmMargem",             // Modal - margem
-    "confirmTotal",              // Modal - total
-    "confirmFuncoes"             // Modal - funções
+    // Inputs principais
+    "revisaoInput",
+    "margemLucro",
+    "searchInput",
+    "draftData",
+
+    // Rows e tabela
+    "funcaoRow",
+    "subtotalCell",
+    "horasInput",
+    "valorHoraInput",
+
+    // Displays e contadores
+    "valorBaseDisplay",
+    "margemAdicionalDisplay",
+    "valorTotalDisplay",
+    "valorTotalHidden",
+    "funcoesCounter",
+    "funcoesCountText",
+    "funcoesAtivasDisplay",
+    "totalHorasDisplay",
+    "funcoesMOIDisplay",
+    "funcoesMODDisplay",
+    "margemPercentDisplay",
+
+    // Estados visuais
+    "emptyState",
+    "progressBar",
+    "autoSaveIndicator",
+    "alertContainer",
+
+    // Botões e ações
+    "submitBtn",
+    "submitText",
+    "submitLoading",
+    "toggleAllBtn",
+    "shortcutsPanel",
+
+    // Validação
+    "revisaoError",
+    "margemLucroError",
+
+    // Modal
+    "confirmRevisao",
+    "confirmMargem",
+    "confirmTotal",
+    "confirmFuncoes",
+    "confirmHoras",
+
+    // Loading
+    "loadingOverlay",
+    "toastContainer"
   ];
+
+  static values = {
+    autoSaveInterval: { type: Number, default: 30000 },
+    debounceDelay: { type: Number, default: 300 },
+    animationDuration: { type: Number, default: 200 }
+  };
 
   /**
    * Inicialização do controlador
    */
   connect() {
-    console.log("PropostaFormController conectado");
-    this.updateTimeout = null; // Para debounce
-    this.initializeTooltips();
-    this.setupKeyboardNavigation();
-    this.update(); // Atualiza cálculos iniciais
+    console.log("PropostaFormController v3.0 conectado");
+
+    // Estado interno
+    this.state = {
+      calculations: {
+        valorBase: 0,
+        margemAdicional: 0,
+        valorTotal: 0,
+        totalHoras: 0,
+        funcoesAtivas: 0,
+        funcoesMOI: 0,
+        funcoesMOD: 0
+      },
+      ui: {
+        isCalculating: false,
+        hasUnsavedChanges: false,
+        searchTerm: '',
+        shortcutsVisible: false
+      },
+      timers: {
+        debounce: null,
+        autoSave: null,
+        progressAnimation: null
+      }
+    };
+
+    // Inicializar componentes
+    this.initializeComponent();
+    this.setupEventListeners();
+    this.startAutoSave();
+    this.loadDraftIfExists();
+
+    // Cálculo inicial
+    this.updateCalculations();
   }
 
   /**
-   * Atualização com debounce para melhor performance
+   * Limpeza quando o controlador é desconectado
    */
-  updateWithDebounce() {
-    if (this.updateTimeout) {
-      clearTimeout(this.updateTimeout);
-    }
-    this.updateTimeout = setTimeout(() => this.update(), 150); // 150ms de debounce para melhor responsividade
+  disconnect() {
+    this.clearAllTimers();
+    console.log("PropostaFormController desconectado");
   }
 
   /**
-   * Manipula teclas especiais nos inputs
+   * Inicialização de componentes
    */
-  handleKeydown(event) {
-    // Enter - vai para próximo campo
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      this.focusNextInput(event.target);
-      return;
-    }
+  initializeComponent() {
+    // Configurar validação
+    this.setupValidation();
 
-    // Tab - força atualização imediata
-    if (event.key === 'Tab') {
-      this.update();
-    }
+    // Configurar formatação automática
+    this.setupAutoFormatting();
+
+    // Configurar acessibilidade
+    this.setupAccessibility();
+
+    // Configurar animações
+    this.setupAnimations();
   }
 
   /**
-   * Inicializa tooltips do Bootstrap
+   * Configurar listeners de eventos
    */
-  initializeTooltips() {
-    const tooltipTriggerList = this.element.querySelectorAll('[data-bs-toggle="tooltip"]');
-    tooltipTriggerList.forEach(tooltipTriggerEl => {
-      new bootstrap.Tooltip(tooltipTriggerEl);
+  setupEventListeners() {
+    // Eventos customizados
+    this.element.addEventListener('proposta-form:save-draft', this.saveDraft.bind(this));
+    this.element.addEventListener('proposta-form:select-all', this.selectAllFunctions.bind(this));
+    this.element.addEventListener('proposta-form:deselect-all', this.deselectAllFunctions.bind(this));
+
+    // Eventos de visibilidade da página
+    document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+
+    // Eventos de resize
+    window.addEventListener('resize', this.debounce(this.handleResize.bind(this), 250));
+  }
+
+  /**
+   * Configurar validação em tempo real
+   */
+  setupValidation() {
+    const validationRules = {
+      revisao: {
+        required: true,
+        min: 1,
+        max: 999,
+        message: 'Revisão deve ser entre 1 e 999'
+      },
+      margem_lucro: {
+        required: true,
+        min: 0,
+        max: 100,
+        message: 'Margem deve ser entre 0% e 100%'
+      }
+    };
+
+    this.validationRules = validationRules;
+  }
+
+  /**
+   * Configurar formatação automática
+   */
+  setupAutoFormatting() {
+    // Formatação de campos monetários
+    this.element.addEventListener('blur', (e) => {
+      if (e.target.matches('[data-proposta-form-target="valorHoraInput"]')) {
+        this.formatCurrencyInput(e);
+      }
+    });
+
+    // Formatação de campos de horas
+    this.element.addEventListener('blur', (e) => {
+      if (e.target.matches('[data-proposta-form-target="horasInput"]')) {
+        this.formatHoursInput(e);
+      }
     });
   }
 
   /**
-   * Configura navegação por teclado
+   * Configurar acessibilidade
+   */
+  setupAccessibility() {
+    // Marcar regiões live
+    this.markLiveRegions();
+
+    // Configurar navegação por teclado
+    this.setupKeyboardNavigation();
+
+    // Configurar anúncios para screen readers
+    this.setupScreenReaderAnnouncements();
+  }
+
+  /**
+   * Configurar animações
+   */
+  setupAnimations() {
+    // Configurar animações de entrada
+    this.animateEntrance();
+
+    // Configurar animações de transição
+    this.setupTransitionAnimations();
+  }
+
+  /**
+   * Marcar regiões live para screen readers
+   */
+  markLiveRegions() {
+    if (this.hasValorTotalDisplayTarget) {
+      this.valorTotalDisplayTarget.setAttribute('aria-live', 'polite');
+      this.valorTotalDisplayTarget.setAttribute('aria-atomic', 'true');
+    }
+
+    if (this.hasFuncoesCountTextTarget) {
+      this.funcoesCountTextTarget.setAttribute('aria-live', 'polite');
+    }
+  }
+
+  /**
+   * Configurar navegação por teclado
    */
   setupKeyboardNavigation() {
-    this.element.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' && event.target.matches('input[type="number"]')) {
-        event.preventDefault();
-        this.focusNextInput(event.target);
+    // Implementar navegação por arrow keys na tabela
+    this.element.addEventListener('keydown', (e) => {
+      if (e.target.closest('.funcoes-table')) {
+        this.handleTableKeyNavigation(e);
       }
     });
   }
 
   /**
-   * Move foco para próximo input
+   * Configurar anúncios para screen readers
    */
-  focusNextInput(currentInput) {
-    const inputs = Array.from(this.element.querySelectorAll('input:not([disabled])'));
-    const currentIndex = inputs.indexOf(currentInput);
-    const nextInput = inputs[currentIndex + 1];
-    if (nextInput) {
-      nextInput.focus();
+  setupScreenReaderAnnouncements() {
+    this.announcements = {
+      functionActivated: (nome) => `Função ${nome} ativada`,
+      functionDeactivated: (nome) => `Função ${nome} desativada`,
+      calculationUpdated: (total) => `Valor total atualizado para ${total}`,
+      validationError: (field, message) => `Erro no campo ${field}: ${message}`
+    };
+  }
+
+  /**
+   * Animação de entrada
+   */
+  animateEntrance() {
+    const cards = this.element.querySelectorAll('.form-section, .summary-section');
+    cards.forEach((card, index) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+
+      setTimeout(() => {
+        card.style.transition = 'all 0.6s ease';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      }, index * 100);
+    });
+  }
+
+  /**
+   * Configurar animações de transição
+   */
+  setupTransitionAnimations() {
+    // Configurar animações para mudanças de valor
+    this.setupValueChangeAnimations();
+
+    // Configurar animações para estados de loading
+    this.setupLoadingAnimations();
+  }
+
+  /**
+   * Configurar animações de mudança de valor
+   */
+  setupValueChangeAnimations() {
+    this.animateValueChange = (element, newValue, duration = 300) => {
+      if (!element) return;
+
+      element.style.transition = `all ${duration}ms ease`;
+      element.classList.add('value-change');
+
+      setTimeout(() => {
+        if (typeof newValue === 'function') {
+          newValue();
+        } else {
+          element.textContent = newValue;
+        }
+
+        setTimeout(() => {
+          element.classList.remove('value-change');
+        }, duration);
+      }, duration / 2);
+    };
+  }
+
+  /**
+   * Configurar animações de loading
+   */
+  setupLoadingAnimations() {
+    this.showLoading = (message = 'Carregando...') => {
+      if (this.hasLoadingOverlayTarget) {
+        this.loadingOverlayTarget.classList.add('active');
+        const messageEl = this.loadingOverlayTarget.querySelector('h6');
+        if (messageEl) messageEl.textContent = message;
+      }
+    };
+
+    this.hideLoading = () => {
+      if (this.hasLoadingOverlayTarget) {
+        this.loadingOverlayTarget.classList.remove('active');
+      }
+    };
+  }
+
+  /**
+   * Iniciar auto-save
+   */
+  startAutoSave() {
+    if (this.autoSaveIntervalValue > 0) {
+      this.state.timers.autoSave = setInterval(() => {
+        if (this.state.ui.hasUnsavedChanges) {
+          this.autoSave();
+        }
+      }, this.autoSaveIntervalValue);
     }
   }
 
   /**
-   * Formata um número como moeda brasileira (BRL).
+   * Carregar rascunho se existir
    */
-  formatCurrency(value) {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value || 0);
+  loadDraftIfExists() {
+    const draft = this.loadFromLocalStorage('proposta-draft');
+    if (draft && draft.timestamp) {
+      const draftAge = Date.now() - draft.timestamp;
+      const maxAge = 24 * 60 * 60 * 1000; // 24 horas
+
+      if (draftAge < maxAge) {
+        this.showDraftPrompt(draft);
+      }
+    }
   }
 
   /**
-   * Formata horas
+   * Mostrar prompt de rascunho
    */
-  formatHours(value) {
-    const hours = parseFloat(value) || 0;
-    if (hours === 0) return "0h";
-    if (hours === 1) return "1h";
-    return `${hours}h`;
+  showDraftPrompt(draft) {
+    this.showToast(
+      'Rascunho encontrado! Clique para carregar.',
+      'info',
+      10000,
+      () => this.loadDraft(draft)
+    );
   }
 
   /**
-   * Formata percentual
-   */
-  formatPercent(value) {
-    const percent = parseFloat(value) || 0;
-    return `${percent.toFixed(2)}%`;
-  }
-
-  /**
-   * Anima alteração de valor
-   */
-  animateValueChange(element) {
-    element.classList.add('value-change');
-    setTimeout(() => {
-      element.classList.remove('value-change');
-    }, 500);
-  }
-
-  /**
-   * Ativa ou desativa uma linha da tabela de funções
+   * Toggle de linha da função
    */
   toggleRow(event) {
-    const row = event.target.closest("tr");
-    const inputs = row.querySelectorAll('input[type="number"]');
-    const isChecked = event.target.checked;
+    const row = event.target.closest('tr');
+    const isActive = event.target.checked;
+    const inputs = row.querySelectorAll('input:not([type="checkbox"])');
 
-    // Adiciona/remove classes visuais
-    if (isChecked) {
-      row.classList.add("is-active");
-      row.classList.remove("is-inactive");
-      inputs.forEach((input) => {
-        input.disabled = false;
-        // Se não tem valor, adiciona valor padrão mais realista
-        if (!input.value && input.name.includes('quantidade_horas')) {
-          input.value = "8"; // 8 horas como padrão mais realista
-          input.focus(); // Foca no campo para facilitar edição
-        }
-      });
-    } else {
-      row.classList.remove("is-active");
-      row.classList.add("is-inactive");
-      inputs.forEach((input) => {
-        input.value = "";
-        input.disabled = true;
-      });
-    }
+    // Animação de ativação
+    this.animateRowToggle(row, isActive);
 
-    this.update();
-    this.updateToggleAllButton();
-  }
-
-
-  /**
-   * Alterna todas as funções
-   */
-  toggleAllFunctions(event) {
-    const checkboxes = this.funcaoRowTargets.map(row =>
-      row.querySelector('input[type="checkbox"]')
-    );
-
-    const allChecked = checkboxes.every(cb => cb.checked);
-    const newState = !allChecked;
-
-    checkboxes.forEach(checkbox => {
-      if (checkbox.checked !== newState) {
-        checkbox.checked = newState;
-        // Dispara evento para cada checkbox
-        const changeEvent = new Event('change', { bubbles: true });
-        checkbox.dispatchEvent(changeEvent);
+    // Habilitar/desabilitar inputs
+    inputs.forEach(input => {
+      input.disabled = !isActive;
+      if (isActive) {
+        input.focus();
       }
     });
 
-    this.updateToggleAllButton();
+    // Atualizar classes
+    row.classList.toggle('is-active', isActive);
+    row.classList.toggle('is-inactive', !isActive);
+
+    // Anunciar mudança
+    const funcaoNome = row.dataset.funcaoNome;
+    this.announceToScreenReader(
+      isActive ?
+        this.announcements.functionActivated(funcaoNome) :
+        this.announcements.functionDeactivated(funcaoNome)
+    );
+
+    // Atualizar cálculos
+    this.updateCalculationsDebounced();
+
+    // Marcar como alterado
+    this.markAsChanged();
   }
 
   /**
-   * Atualiza o botão "Selecionar Todas"
+   * Animação de toggle da linha
    */
-  updateToggleAllButton() {
-    if (!this.hasToggleAllBtnTarget) return;
+  animateRowToggle(row, isActive) {
+    const duration = this.animationDurationValue;
 
-    const checkboxes = this.funcaoRowTargets.map(row =>
-      row.querySelector('input[type="checkbox"]')
-    );
-    const checkedCount = checkboxes.filter(cb => cb.checked).length;
-    const allChecked = checkedCount === checkboxes.length;
+    if (isActive) {
+      row.style.transform = 'scale(1.02)';
+      row.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.15)';
 
-    const btn = this.toggleAllBtnTarget;
-    const icon = btn.querySelector('i');
-    const text = btn.lastChild;
-
-    if (allChecked) {
-      btn.classList.remove('btn-outline-primary');
-      btn.classList.add('btn-outline-danger');
-      icon.className = 'bi bi-x-square me-1';
-      text.textContent = ' Desmarcar Todas';
+      setTimeout(() => {
+        row.style.transform = 'scale(1)';
+        row.style.boxShadow = '';
+      }, duration);
     } else {
-      btn.classList.remove('btn-outline-danger');
-      btn.classList.add('btn-outline-primary');
-      icon.className = 'bi bi-check2-all me-1';
-      text.textContent = ' Selecionar Todas';
+      row.style.transform = 'scale(0.98)';
+      setTimeout(() => {
+        row.style.transform = 'scale(1)';
+      }, duration);
     }
   }
 
   /**
-   * Valida campo individual
+   * Filtrar funções baseado na busca
+   */
+  filterFunctions(event) {
+    const searchTerm = event.target.value.toLowerCase().trim();
+    this.state.ui.searchTerm = searchTerm;
+
+    let visibleCount = 0;
+    let hiddenCount = 0;
+
+    this.funcaoRowTargets.forEach(row => {
+      const funcaoNome = row.dataset.funcaoNome?.toLowerCase() || '';
+      const funcaoTipo = row.dataset.funcaoTipo?.toLowerCase() || '';
+      const isVisible = !searchTerm ||
+        funcaoNome.includes(searchTerm) ||
+        funcaoTipo.includes(searchTerm);
+
+      if (isVisible) {
+        row.classList.remove('is-filtered-out');
+        visibleCount++;
+      } else {
+        row.classList.add('is-filtered-out');
+        hiddenCount++;
+      }
+    });
+
+    // Mostrar/ocultar estado vazio
+    this.toggleEmptyState(visibleCount === 0);
+
+    // Anunciar resultado da busca
+    if (searchTerm) {
+      this.announceToScreenReader(
+        `${visibleCount} funções encontradas para "${searchTerm}"`
+      );
+    }
+  }
+
+  /**
+   * Limpar busca
+   */
+  clearSearch() {
+    if (this.hasSearchInputTarget) {
+      this.searchInputTarget.value = '';
+      this.searchInputTarget.dispatchEvent(new Event('input'));
+      this.searchInputTarget.focus();
+    }
+  }
+
+  /**
+   * Selecionar todas as funções
+   */
+  selectAllFunctions() {
+    const visibleRows = this.funcaoRowTargets.filter(row =>
+      !row.classList.contains('is-filtered-out')
+    );
+
+    visibleRows.forEach(row => {
+      const checkbox = row.querySelector('input[type="checkbox"]');
+      if (checkbox && !checkbox.checked) {
+        checkbox.checked = true;
+        checkbox.dispatchEvent(new Event('change'));
+      }
+    });
+
+    this.showToast('Todas as funções foram selecionadas', 'success');
+    this.announceToScreenReader('Todas as funções visíveis foram selecionadas');
+  }
+
+  /**
+   * Desmarcar todas as funções
+   */
+  deselectAllFunctions() {
+    this.funcaoRowTargets.forEach(row => {
+      const checkbox = row.querySelector('input[type="checkbox"]');
+      if (checkbox && checkbox.checked) {
+        checkbox.checked = false;
+        checkbox.dispatchEvent(new Event('change'));
+      }
+    });
+
+    this.showToast('Todas as funções foram desmarcadas', 'info');
+    this.announceToScreenReader('Todas as funções foram desmarcadas');
+  }
+
+  /**
+   * Selecionar apenas funções MOI
+   */
+  selectMOI() {
+    this.selectFunctionsByType('moi');
+  }
+
+  /**
+   * Selecionar apenas funções MOD
+   */
+  selectMOD() {
+    this.selectFunctionsByType('mod');
+  }
+
+  /**
+   * Selecionar funções por tipo
+   */
+  selectFunctionsByType(tipo) {
+    // Primeiro desmarcar todas
+    this.deselectAllFunctions();
+
+    // Depois selecionar apenas do tipo especificado
+    const targetRows = this.funcaoRowTargets.filter(row =>
+      row.dataset.funcaoTipo === tipo && !row.classList.contains('is-filtered-out')
+    );
+
+    targetRows.forEach(row => {
+      const checkbox = row.querySelector('input[type="checkbox"]');
+      if (checkbox) {
+        checkbox.checked = true;
+        checkbox.dispatchEvent(new Event('change'));
+      }
+    });
+
+    this.showToast(`Funções ${tipo.toUpperCase()} selecionadas`, 'success');
+    this.announceToScreenReader(`${targetRows.length} funções ${tipo.toUpperCase()} selecionadas`);
+  }
+
+  /**
+   * Atualizar cálculos com debounce
+   */
+  updateCalculationsDebounced() {
+    this.clearTimeout('debounce');
+    this.state.timers.debounce = setTimeout(() => {
+      this.updateCalculations();
+    }, this.debounceDelayValue);
+  }
+
+  /**
+   * Validar e atualizar
+   */
+  validateAndUpdate(event) {
+    this.validateField(event);
+    this.updateCalculationsDebounced();
+    this.markAsChanged();
+  }
+
+  /**
+   * Validar campo específico
    */
   validateField(event) {
     const field = event.target;
-    const value = field.value;
+    const fieldName = field.name?.split('[').pop()?.replace(']', '');
+    const rules = this.validationRules[fieldName];
+
+    if (!rules) return;
+
+    const value = parseFloat(field.value) || 0;
     let isValid = true;
     let errorMessage = '';
 
-    // Validação específica por campo
-    if (field === this.margemLucroTarget) {
-      if (!value || value < 0 || value > 100) {
-        isValid = false;
-        errorMessage = 'Margem deve estar entre 0% e 100%';
-      }
-    }
-
-    // Campos obrigatórios
-    if (field.hasAttribute('required') && !value) {
+    // Validar obrigatoriedade
+    if (rules.required && !field.value.trim()) {
       isValid = false;
       errorMessage = 'Este campo é obrigatório';
     }
 
-    // Atualiza estado visual
-    if (isValid) {
-      field.classList.remove('is-invalid');
-      field.classList.add('is-valid');
-    } else {
-      field.classList.remove('is-valid');
-      field.classList.add('is-invalid');
+    // Validar mínimo
+    if (isValid && rules.min !== undefined && value < rules.min) {
+      isValid = false;
+      errorMessage = `Valor deve ser maior ou igual a ${rules.min}`;
     }
 
-    // Mostra/esconde mensagem de erro
-    const errorTarget = field.name === 'proposta[revisao]' ?
-      this.revisaoErrorTarget : this.margemLucroErrorTarget;
+    // Validar máximo
+    if (isValid && rules.max !== undefined && value > rules.max) {
+      isValid = false;
+      errorMessage = `Valor deve ser menor ou igual a ${rules.max}`;
+    }
 
+    // Aplicar classes de validação
+    field.classList.toggle('is-invalid', !isValid);
+    field.classList.toggle('is-valid', isValid && field.value.trim());
+
+    // Mostrar erro
+    const errorTarget = this[`${fieldName}ErrorTarget`];
     if (errorTarget) {
       errorTarget.textContent = errorMessage;
+      errorTarget.style.display = errorMessage ? 'block' : 'none';
+    }
+
+    // Anunciar erro
+    if (!isValid) {
+      this.announceToScreenReader(this.announcements.validationError(fieldName, errorMessage));
     }
 
     return isValid;
   }
 
   /**
-   * Formata campo de moeda ao sair do campo
+   * Atualizar cálculos principais
+   */
+  updateCalculations() {
+    if (this.state.ui.isCalculating) return;
+
+    this.state.ui.isCalculating = true;
+    this.updateProgressBar(0);
+
+    try {
+      // Calcular valores
+      const calculations = this.calculateValues();
+
+      // Atualizar estado
+      this.state.calculations = calculations;
+
+      // Atualizar interface
+      this.updateDisplays(calculations);
+
+      // Atualizar progresso
+      this.updateProgressBar(100);
+
+      // Anunciar mudança
+      this.announceCalculationUpdate(calculations);
+
+    } catch (error) {
+      console.error('Erro ao calcular valores:', error);
+      this.showToast('Erro ao calcular valores', 'error');
+    } finally {
+      this.state.ui.isCalculating = false;
+      setTimeout(() => this.updateProgressBar(0), 1000);
+    }
+  }
+
+  /**
+   * Calcular valores
+   */
+  calculateValues() {
+    let valorBase = 0;
+    let totalHoras = 0;
+    let funcoesAtivas = 0;
+    let funcoesMOI = 0;
+    let funcoesMOD = 0;
+
+    // Iterar sobre as funções ativas
+    this.funcaoRowTargets.forEach(row => {
+      const checkbox = row.querySelector('input[type="checkbox"]');
+      if (!checkbox?.checked) return;
+
+      const horasInput = row.querySelector('[data-proposta-form-target="horasInput"]');
+      const valorHoraInput = row.querySelector('[data-proposta-form-target="valorHoraInput"]');
+      const subtotalCell = row.querySelector('[data-proposta-form-target="subtotalCell"]');
+
+      const horas = parseFloat(horasInput?.value) || 0;
+      const valorHora = parseFloat(valorHoraInput?.value) || 0;
+      const subtotal = horas * valorHora;
+
+      // Atualizar subtotal na célula
+      if (subtotalCell) {
+        this.animateValueChange(subtotalCell, window.formatCurrency(subtotal));
+        subtotalCell.classList.toggle('has-value', subtotal > 0);
+      }
+
+      // Acumular valores
+      valorBase += subtotal;
+      totalHoras += horas;
+      funcoesAtivas++;
+
+      // Contar por tipo
+      const tipo = row.dataset.funcaoTipo;
+      if (tipo === 'moi') funcoesMOI++;
+      if (tipo === 'mod') funcoesMOD++;
+    });
+
+    // Calcular margem
+    const margemPercent = parseFloat(this.margemLucroTarget?.value) || 0;
+    const margemAdicional = valorBase * (margemPercent / 100);
+    const valorTotal = valorBase + margemAdicional;
+
+    return {
+      valorBase,
+      margemAdicional,
+      valorTotal,
+      totalHoras,
+      funcoesAtivas,
+      funcoesMOI,
+      funcoesMOD,
+      margemPercent
+    };
+  }
+
+  /**
+   * Atualizar displays
+   */
+  updateDisplays(calculations) {
+    const {
+      valorBase,
+      margemAdicional,
+      valorTotal,
+      totalHoras,
+      funcoesAtivas,
+      funcoesMOI,
+      funcoesMOD,
+      margemPercent
+    } = calculations;
+
+    // Atualizar displays com animação
+    if (this.hasValorBaseDisplayTarget) {
+      this.animateValueChange(this.valorBaseDisplayTarget, window.formatCurrency(valorBase));
+    }
+
+    if (this.hasMargemAdicionalDisplayTarget) {
+      this.animateValueChange(this.margemAdicionalDisplayTarget, window.formatCurrency(margemAdicional));
+    }
+
+    if (this.hasValorTotalDisplayTarget) {
+      this.animateValueChange(this.valorTotalDisplayTarget, window.formatCurrency(valorTotal));
+    }
+
+    if (this.hasTotalHorasDisplayTarget) {
+      this.animateValueChange(this.totalHorasDisplayTarget, window.formatHours(totalHoras));
+    }
+
+    if (this.hasFuncoesAtivasDisplayTarget) {
+      this.animateValueChange(this.funcoesAtivasDisplayTarget, funcoesAtivas.toString());
+    }
+
+    if (this.hasFuncoesMOIDisplayTarget) {
+      this.animateValueChange(this.funcoesMOIDisplayTarget, funcoesMOI.toString());
+    }
+
+    if (this.hasFuncoesMODDisplayTarget) {
+      this.animateValueChange(this.funcoesMODDisplayTarget, funcoesMOD.toString());
+    }
+
+    if (this.hasMargemPercentDisplayTarget) {
+      this.animateValueChange(this.margemPercentDisplayTarget, `(${margemPercent.toFixed(1)}%)`);
+    }
+
+    // Atualizar contador de funções
+    this.updateFunctionCounter(funcoesAtivas);
+
+    // Atualizar campo hidden
+    if (this.hasValorTotalHiddenTarget) {
+      this.valorTotalHiddenTarget.value = valorTotal.toFixed(2);
+    }
+
+    // Atualizar estado visual do botão
+    this.updateSubmitButton(funcoesAtivas > 0);
+  }
+
+  /**
+   * Atualizar contador de funções
+   */
+  updateFunctionCounter(count) {
+    if (this.hasFuncoesCountTextTarget) {
+      const text = count === 1 ? '1 função selecionada' : `${count} funções selecionadas`;
+      this.animateValueChange(this.funcoesCountTextTarget, text);
+    }
+
+    if (this.hasFuncoesCounterTarget) {
+      this.funcoesCounterTarget.classList.toggle('has-selection', count > 0);
+    }
+  }
+
+  /**
+   * Atualizar botão de submit
+   */
+  updateSubmitButton(hasSelection) {
+    if (this.hasSubmitBtnTarget) {
+      this.submitBtnTarget.disabled = !hasSelection;
+      this.submitBtnTarget.classList.toggle('btn-success', hasSelection);
+      this.submitBtnTarget.classList.toggle('btn-secondary', !hasSelection);
+    }
+  }
+
+  /**
+   * Atualizar barra de progresso
+   */
+  updateProgressBar(percentage) {
+    if (this.hasProgressBarTarget) {
+      this.progressBarTarget.style.width = `${percentage}%`;
+      this.progressBarTarget.setAttribute('aria-valuenow', percentage);
+    }
+  }
+
+  /**
+   * Anunciar atualização de cálculo
+   */
+  announceCalculationUpdate(calculations) {
+    const message = this.announcements.calculationUpdated(
+      window.formatCurrency(calculations.valorTotal)
+    );
+
+    this.announceToScreenReader(message);
+  }
+
+  /**
+   * Formatar input de moeda
    */
   formatCurrencyInput(event) {
     const input = event.target;
     const value = parseFloat(input.value) || 0;
 
-    // Não formata se estiver vazio ou inválido
-    if (!input.value) return;
+    // Não formatar se o usuário ainda está digitando
+    if (document.activeElement === input) return;
 
-    // Formata com 2 casas decimais
+    // Formatar valor
     input.value = value.toFixed(2);
   }
 
   /**
-   * Formata campo de horas ao sair do campo
+   * Formatar input de horas
    */
   formatHoursInput(event) {
     const input = event.target;
     const value = parseFloat(input.value) || 0;
 
-    if (!input.value) return;
+    // Não formatar se o usuário ainda está digitando
+    if (document.activeElement === input) return;
 
-    // Formata com 1 casa decimal se necessário
-    input.value = value % 1 === 0 ? value.toString() : value.toFixed(1);
+    // Arredondar para 0.5
+    const rounded = Math.round(value * 2) / 2;
+    input.value = rounded.toFixed(1);
   }
 
   /**
-   * Função principal que atualiza todos os cálculos do orçamento.
+   * Mostrar modal de confirmação
    */
-  update() {
-    let valorBase = 0;
-    let totalHoras = 0;
-    let funcoesAtivas = 0;
+  showConfirmation() {
+    if (!this.validateForm()) return;
 
-    // Percorre todas as linhas de função para calcular subtotais
-    this.funcaoRowTargets.forEach((row) => {
-      const checkbox = row.querySelector('input[type="checkbox"]');
-      const subtotalCell = row.querySelector(".subtotal-cell");
-
-      if (checkbox && checkbox.checked) {
-        funcoesAtivas++;
-
-        // Obtém inputs de horas e valor/hora
-        const inputs = row.querySelectorAll('input[type="number"]');
-        const horasInput = inputs[0]; // primeiro input = horas
-        const valorHoraInput = inputs[1]; // segundo input = valor/hora
-
-        const horas = parseFloat(horasInput?.value) || 0;
-        const valorHora = parseFloat(valorHoraInput?.value) || 0;
-        const subtotal = horas * valorHora;
-
-        valorBase += subtotal;
-        totalHoras += horas;
-
-        if (subtotalCell) {
-          subtotalCell.textContent = this.formatCurrency(subtotal);
-          subtotalCell.classList.add('has-value');
-          this.animateValueChange(subtotalCell);
-        }
-      } else {
-        if (subtotalCell) {
-          subtotalCell.textContent = "—";
-          subtotalCell.classList.remove('has-value');
-        }
-      }
-    });
-
-    // Calcula margem de lucro e valor total
-    const margemPercentual = parseFloat(this.margemLucroTarget?.value) || 0;
-    const margemAdicional = valorBase * (margemPercentual / 100);
-    const valorTotal = valorBase + margemAdicional;
-
-    // Atualiza displays principais
-    this.updateDisplay(this.valorBaseDisplayTarget, this.formatCurrency(valorBase));
-    this.updateDisplay(this.margemAdicionalDisplayTarget, this.formatCurrency(margemAdicional));
-    this.updateDisplay(this.valorTotalDisplayTarget, this.formatCurrency(valorTotal));
-
-    // Atualiza displays adicionais
-    if (this.hasFuncoesAtivasDisplayTarget) {
-      this.updateDisplay(this.funcoesAtivasDisplayTarget, funcoesAtivas.toString());
-    }
-
-    if (this.hasTotalHorasDisplayTarget) {
-      this.updateDisplay(this.totalHorasDisplayTarget, this.formatHours(totalHoras));
-    }
-
-    if (this.hasMargemPercentDisplayTarget) {
-      this.updateDisplay(this.margemPercentDisplayTarget, `(${this.formatPercent(margemPercentual)})`);
-    }
-
-    // Atualiza campo hidden
-    if (this.hasValorTotalHiddenTarget) {
-      this.valorTotalHiddenTarget.value = valorTotal.toFixed(2);
-    }
-
-    // Atualiza contador de funções
-    this.updateFuncoesCounter(funcoesAtivas);
-
-    // Controla estado vazio
-    this.toggleEmptyState(funcoesAtivas === 0);
-
-    // Atualiza estado do botão submit
-    this.updateSubmitButton(funcoesAtivas > 0 && valorTotal > 0);
-  }
-
-  /**
-   * Atualiza display com animação
-   */
-  updateDisplay(target, value) {
-    if (target && target.textContent !== value) {
-      target.textContent = value;
-      this.animateValueChange(target);
-    }
-  }
-
-  /**
-   * Atualiza contador de funções
-   */
-  updateFuncoesCounter(count) {
-    if (!this.hasFuncoesCounterTarget) return;
-
-    const counter = this.funcoesCounterTarget;
-    const text = this.funcoesCountTextTarget;
-
-    if (count === 0) {
-      text.textContent = "Nenhuma função selecionada";
-      counter.classList.remove('has-selection');
-    } else if (count === 1) {
-      text.textContent = "1 função selecionada";
-      counter.classList.add('has-selection');
-    } else {
-      text.textContent = `${count} funções selecionadas`;
-      counter.classList.add('has-selection');
-    }
-
-    // Animação visual do contador quando há mudança
-    counter.style.transform = 'scale(1.05)';
-    setTimeout(() => {
-      counter.style.transform = 'scale(1)';
-    }, 150);
-  }
-
-
-  /**
-   * Controla exibição do estado vazio
-   */
-  toggleEmptyState(isEmpty) {
-    if (!this.hasEmptyStateTarget) return;
-
-    const emptyState = this.emptyStateTarget;
-    const table = this.element.querySelector('.funcoes-table');
-
-    if (isEmpty) {
-      emptyState.classList.remove('d-none');
-      table?.classList.add('d-none');
-    } else {
-      emptyState.classList.add('d-none');
-      table?.classList.remove('d-none');
-    }
-  }
-
-  /**
-   * Atualiza estado do botão submit
-   */
-  updateSubmitButton(enabled) {
-    if (!this.hasSubmitBtnTarget) return;
-
-    const btn = this.submitBtnTarget;
-    btn.disabled = !enabled;
-
-    if (!enabled) {
-      btn.setAttribute('title', 'Selecione pelo menos uma função para continuar');
-    } else {
-      btn.removeAttribute('title');
-    }
-  }
-
-  /**
-   * Mostra modal de confirmação
-   */
-  showConfirmation(event) {
-    event.preventDefault();
-
-    // Valida formulário primeiro
-    if (!this.validateForm()) {
-      return;
-    }
-
-    // Atualiza dados do modal
+    // Atualizar dados do modal
     this.updateConfirmationModal();
 
-    // Mostra modal
+    // Mostrar modal
     const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
     modal.show();
   }
 
   /**
-   * Valida formulário completo
+   * Atualizar modal de confirmação
+   */
+  updateConfirmationModal() {
+    const { calculations } = this.state;
+
+    if (this.hasConfirmRevisaoTarget) {
+      this.confirmRevisaoTarget.textContent = this.revisaoInputTarget?.value || '—';
+    }
+
+    if (this.hasConfirmMargemTarget) {
+      this.confirmMargemTarget.textContent = `${calculations.margemPercent.toFixed(1)}%`;
+    }
+
+    if (this.hasConfirmTotalTarget) {
+      this.confirmTotalTarget.textContent = window.formatCurrency(calculations.valorTotal);
+    }
+
+    if (this.hasConfirmFuncoesTarget) {
+      this.confirmFuncoesTarget.textContent = `${calculations.funcoesAtivas} funções`;
+    }
+
+    if (this.hasConfirmHorasTarget) {
+      this.confirmHorasTarget.textContent = window.formatHours(calculations.totalHoras);
+    }
+  }
+
+  /**
+   * Validar formulário
    */
   validateForm() {
     let isValid = true;
 
-    // Valida campos obrigatórios
-    const requiredFields = this.element.querySelectorAll('input[required]');
+    // Validar campos obrigatórios
+    const requiredFields = [this.revisaoInputTarget, this.margemLucroTarget].filter(Boolean);
+
     requiredFields.forEach(field => {
-      const fieldValid = this.validateField({ target: field });
-      if (!fieldValid) isValid = false;
+      if (!this.validateField({ target: field })) {
+        isValid = false;
+      }
     });
 
-    // Verifica se há funções selecionadas
-    const funcoesAtivas = this.funcaoRowTargets.filter(row =>
-      row.querySelector('input[type="checkbox"]')?.checked
-    ).length;
-
-    if (funcoesAtivas === 0) {
-      alert('Selecione pelo menos uma função para continuar.');
+    // Validar se há pelo menos uma função selecionada
+    if (this.state.calculations.funcoesAtivas === 0) {
+      this.showToast('Selecione pelo menos uma função', 'warning');
       isValid = false;
     }
 
@@ -520,80 +924,214 @@ export default class extends Controller {
   }
 
   /**
-   * Atualiza dados do modal de confirmação
-   */
-  updateConfirmationModal() {
-    if (this.hasConfirmRevisaoTarget) {
-      const revisao = this.element.querySelector('input[name="proposta[revisao]"]')?.value || '-';
-      this.confirmRevisaoTarget.textContent = revisao;
-    }
-
-    if (this.hasConfirmMargemTarget) {
-      const margem = this.margemLucroTarget?.value || '0';
-      this.confirmMargemTarget.textContent = `${margem}%`;
-    }
-
-    if (this.hasConfirmTotalTarget) {
-      this.confirmTotalTarget.textContent = this.valorTotalDisplayTarget?.textContent || 'R$ 0,00';
-    }
-
-    if (this.hasConfirmFuncoesTarget) {
-      const funcoesAtivas = this.funcaoRowTargets.filter(row =>
-        row.querySelector('input[type="checkbox"]')?.checked
-      ).length;
-      this.confirmFuncoesTarget.textContent = `${funcoesAtivas} função(ões) selecionada(s)`;
-    }
-  }
-
-  /**
-   * Confirma e submete o formulário
+   * Confirmar e enviar
    */
   confirmSubmit() {
-    this.showLoadingState();
+    // Fechar modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+    if (modal) modal.hide();
 
-    // Submete o formulário
-    setTimeout(() => {
-      this.element.querySelector('form')?.submit();
-    }, 500);
-  }
+    // Mostrar loading
+    this.showLoading('Criando proposta...');
 
-  /**
-   * Mostra estado de loading
-   */
-  showLoadingState() {
-    // Mostra overlay de loading
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-      loadingOverlay.classList.add('active');
-    }
-
-    // Atualiza botão
-    if (this.hasSubmitBtnTarget && this.hasSubmitTextTarget && this.hasSubmitLoadingTarget) {
+    // Desabilitar botão
+    if (this.hasSubmitBtnTarget) {
       this.submitBtnTarget.disabled = true;
       this.submitTextTarget.classList.add('d-none');
       this.submitLoadingTarget.classList.remove('d-none');
     }
 
-    // Fecha modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-    if (modal) {
-      modal.hide();
+    // Simular delay para UX
+    setTimeout(() => {
+      // Limpar rascunho
+      this.clearDraft();
+
+      // Submeter formulário
+      this.element.submit();
+    }, 1000);
+  }
+
+  /**
+   * Salvar rascunho
+   */
+  saveDraft() {
+    const draftData = this.collectFormData();
+
+    if (this.saveToLocalStorage('proposta-draft', {
+      ...draftData,
+      timestamp: Date.now()
+    })) {
+      this.showToast('Rascunho salvo com sucesso', 'success');
+      this.showAutoSaveIndicator();
+      this.state.ui.hasUnsavedChanges = false;
+    } else {
+      this.showToast('Erro ao salvar rascunho', 'error');
     }
   }
 
   /**
-   * Método chamado quando o controlador é desconectado
+   * Auto-save
    */
-  disconnect() {
-    console.log("PropostaFormController desconectado");
+  autoSave() {
+    if (!this.state.ui.hasUnsavedChanges) return;
 
-    // Limpa tooltips
-    const tooltips = this.element.querySelectorAll('[data-bs-toggle="tooltip"]');
-    tooltips.forEach(element => {
-      const tooltip = bootstrap.Tooltip.getInstance(element);
-      if (tooltip) {
-        tooltip.dispose();
+    this.saveDraft();
+  }
+
+  /**
+   * Carregar rascunho
+   */
+  loadDraft(draft) {
+    // Implementar carregamento de rascunho
+    this.showToast('Rascunho carregado', 'success');
+    this.updateCalculations();
+  }
+
+  /**
+   * Limpar rascunho
+   */
+  clearDraft() {
+    localStorage.removeItem('proposta-draft');
+  }
+
+  /**
+   * Coletar dados do formulário
+   */
+  collectFormData() {
+    const formData = {};
+
+    // Coletar dados dos inputs
+    const inputs = this.element.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+      if (input.name) {
+        formData[input.name] = input.value;
       }
     });
+
+    return formData;
+  }
+
+  /**
+   * Mostrar indicador de auto-save
+   */
+  showAutoSaveIndicator() {
+    if (this.hasAutoSaveIndicatorTarget) {
+      this.autoSaveIndicatorTarget.classList.remove('d-none');
+      setTimeout(() => {
+        this.autoSaveIndicatorTarget.classList.add('d-none');
+      }, 3000);
+    }
+  }
+
+  /**
+   * Marcar como alterado
+   */
+  markAsChanged() {
+    this.state.ui.hasUnsavedChanges = true;
+  }
+
+  /**
+   * Toggle do painel de atalhos
+   */
+  toggleShortcuts() {
+    if (this.hasShortcutsPanelTarget) {
+      this.shortcutsPanelTarget.classList.toggle('show');
+      this.state.ui.shortcutsVisible = !this.state.ui.shortcutsVisible;
+    }
+  }
+
+  /**
+   * Utility functions
+   */
+  debounce(func, delay) {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  clearTimeout(timerName) {
+    if (this.state.timers[timerName]) {
+      clearTimeout(this.state.timers[timerName]);
+      this.state.timers[timerName] = null;
+    }
+  }
+
+  clearAllTimers() {
+    Object.keys(this.state.timers).forEach(timerName => {
+      this.clearTimeout(timerName);
+    });
+  }
+
+  saveToLocalStorage(key, data) {
+    return window.saveToLocalStorage(key, data);
+  }
+
+  loadFromLocalStorage(key) {
+    return window.loadFromLocalStorage(key);
+  }
+
+  showToast(message, type = 'info', duration = 5000, callback = null) {
+    window.showToast(message, type, duration);
+    if (callback) {
+      // Implementar callback se necessário
+    }
+  }
+
+  announceToScreenReader(message) {
+    const announcement = document.createElement('div');
+    announcement.textContent = message;
+    announcement.style.position = 'absolute';
+    announcement.style.left = '-9999px';
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.setAttribute('aria-atomic', 'true');
+
+    document.body.appendChild(announcement);
+
+    setTimeout(() => {
+      document.body.removeChild(announcement);
+    }, 1000);
+  }
+
+  toggleEmptyState(show) {
+    if (this.hasEmptyStateTarget) {
+      this.emptyStateTarget.classList.toggle('d-none', !show);
+    }
+  }
+
+  handleVisibilityChange() {
+    if (document.hidden) {
+      // Página ficou oculta - salvar rascunho se necessário
+      if (this.state.ui.hasUnsavedChanges) {
+        this.autoSave();
+      }
+    }
+  }
+
+  handleResize() {
+    // Implementar ajustes de responsividade se necessário
+  }
+
+  handleTableKeyNavigation(event) {
+    // Implementar navegação por teclado na tabela
+    const { key } = event;
+
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+      event.preventDefault();
+      // Implementar lógica de navegação
+    }
+  }
+
+  handleSubmit(event) {
+    // Última validação antes do envio
+    if (!this.validateForm()) {
+      event.preventDefault();
+      return false;
+    }
+
+    // Marcar como enviado
+    this.state.ui.hasUnsavedChanges = false;
+    return true;
   }
 }

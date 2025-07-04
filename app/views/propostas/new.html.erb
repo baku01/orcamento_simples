@@ -1,700 +1,330 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>Nova Proposta | Versão Dinâmica</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Nova Proposta | Sistema de Orçamentos</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Crie propostas orçamentárias de forma rápida e eficiente">
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
+
+  <!-- CSS Dependencies -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-    :root {
-      --primary-color: #6366f1;
-      --primary-rgb: 99, 102, 241;
-      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      --success-color: #10b981;
-      --success-rgb: 16, 185, 129;
-      --danger-color: #ef4444;
-      --warning-color: #f59e0b;
-      --light-bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text-color: #1e293b;
-      --muted-text-color: #64748b;
-      --border-color: #e2e8f0;
-      --error-color: #fca5a5;
-      --border-radius: 1rem;
-      --font-family: 'Inter', sans-serif;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      background-color: var(--light-bg);
-      font-family: var(--font-family);
-      color: var(--text-color);
-      line-height: 1.6;
-    }
-
-    /* Animações */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-
-    /* Sections */
-    .form-section {
-      background-color: var(--card-bg);
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--border-color);
-      padding: 2.5rem;
-      animation: fadeInUp 0.6s ease-out;
-      transition: all 0.3s ease;
-    }
-
-    .form-section:hover {
-      box-shadow: var(--shadow-lg);
-    }
-
-    .summary-section {
-      border-radius: var(--border-radius);
-      padding: 2rem;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-md);
-      transition: all 0.3s ease;
-    }
-
-    /* Form Elements */
-    .form-label {
-      font-weight: 600;
-      font-size: 0.875rem;
-      margin-bottom: 0.5rem;
-      color: var(--text-color);
-    }
-
-    .form-label.required::after {
-      content: ' *';
-      color: var(--danger-color);
-      font-weight: 700;
-    }
-
-    .form-control, .form-select {
-      height: 50px;
-      border: 2px solid var(--border-color);
-      font-size: 1rem;
-      background-color: #fff;
-      transition: all 0.3s ease;
-      border-radius: 0.5rem;
-    }
-
-    .form-control:disabled {
-      background-color: var(--light-bg);
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
-
-    .form-control:focus, .form-select:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15);
-      outline: none;
-      transform: translateY(-1px);
-    }
-
-    .form-control.is-invalid {
-      border-color: var(--danger-color);
-      animation: shake 0.5s ease-in-out;
-    }
-
-    .form-control.is-valid {
-      border-color: var(--success-color);
-    }
-
-    .invalid-feedback {
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-
-    /* Input Groups */
-    .input-group-text {
-      background-color: var(--light-bg);
-      border: 2px solid var(--border-color);
-      border-right: none;
-      color: var(--primary-color);
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .input-group:focus-within .input-group-text {
-      border-color: var(--primary-color);
-      background-color: rgba(var(--primary-rgb), 0.05);
-    }
-
-    /* Section Titles */
-    .section-title {
-      font-weight: 700;
-      font-size: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-      position: relative;
-    }
-
-    .section-title i {
-      color: var(--primary-color);
-      font-size: 1.5rem;
-    }
-
-    .section-subtitle {
-      font-size: 0.9rem;
-      color: var(--muted-text-color);
-      font-weight: 500;
-      margin-top: 0.25rem;
-    }
-
-    /* Toggle Switch */
-    .form-switch {
-      padding-left: 3.5em;
-    }
-
-    .form-check-input {
-      width: 2.5em;
-      height: 1.5em;
-      cursor: pointer;
-      background-color: var(--border-color);
-      border-color: var(--border-color);
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
-      transition: all 0.3s ease;
-    }
-
-    .form-check-input:checked {
-      background-color: var(--success-color);
-      border-color: var(--success-color);
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewView='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
-      transform: scale(1.1);
-    }
-
-    .form-check-input:focus {
-      box-shadow: 0 0 0 4px rgba(var(--success-rgb), 0.25);
-    }
-
-    /* Funções Table */
-    .funcoes-table {
-      border: none;
-    }
-
-    .funcoes-table tbody tr {
-      border-bottom: 1px solid var(--border-color);
-      transition: all 0.2s ease;
-    }
-
-    .funcoes-table tbody tr:hover {
-      background-color: rgba(var(--primary-rgb), 0.02);
-    }
-
-    .funcoes-table tbody tr.is-active {
-      background-color: rgba(var(--success-rgb), 0.05);
-      border-left: 4px solid var(--success-color);
-    }
-
-    .funcoes-table tbody tr.is-inactive {
-      opacity: 0.6;
-    }
-
-    .funcoes-table td {
-      padding: 1rem 0.75rem;
-      vertical-align: middle;
-    }
-
-    .funcoes-table .funcao-nome {
-      font-weight: 600;
-      color: var(--text-color);
-      cursor: pointer;
-      transition: color 0.2s ease;
-    }
-
-    .funcoes-table .funcao-nome:hover {
-      color: var(--primary-color);
-    }
-
-    /* Subtotal Cell */
-    .subtotal-cell {
-      font-weight: 600;
-      color: var(--muted-text-color);
-      text-align: right;
-      transition: all 0.3s ease;
-    }
-
-    .subtotal-cell.has-value {
-      color: var(--success-color);
-      font-weight: 700;
-    }
-
-    /* Contador de Funções */
-    .funcoes-counter {
-      background: rgba(var(--primary-rgb), 0.1);
-      color: var(--primary-color);
-      padding: 0.75rem 1rem;
-      border-radius: 0.75rem;
-      font-weight: 600;
-      font-size: 0.875rem;
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
-    }
-
-    .funcoes-counter.has-selection {
-      background: rgba(var(--success-rgb), 0.1);
-      color: var(--success-color);
-      border-color: rgba(var(--success-rgb), 0.2);
-      transform: scale(1.02);
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 3rem 2rem;
-      color: var(--muted-text-color);
-    }
-
-    .empty-state i {
-      font-size: 3rem;
-      color: var(--border-color);
-      margin-bottom: 1rem;
-    }
-
-    /* Summary List */
-    .summary-list li {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 0;
-      border-bottom: 1px solid var(--border-color);
-      transition: background-color 0.2s ease;
-    }
-
-    .summary-list li:last-child {
-      border-bottom: none;
-    }
-
-    .summary-list li:hover {
-      background-color: rgba(var(--primary-rgb), 0.02);
-      border-radius: 0.5rem;
-      margin: 0 -0.5rem;
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-    }
-
-    .summary-list span {
-      color: var(--muted-text-color);
-      font-weight: 500;
-    }
-
-    .summary-list strong {
-      font-weight: 700;
-      color: var(--text-color);
-    }
-
-    .summary-list .value-change {
-      animation: pulse 0.5s ease-in-out;
-    }
-
-    /* Total Summary */
-    .total-summary {
-      background: var(--primary-gradient);
-      color: white;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      text-align: center;
-      margin-top: 1.5rem;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow-md);
-    }
-
-    .total-summary:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .total-summary::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s;
-    }
-
-    .total-summary:hover::before {
-      left: 100%;
-    }
-
-    /* Total Labels */
-    .total-label {
-      font-size: 0.875rem;
-      opacity: 0.9;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-
-    .total-value {
-      font-size: 2rem;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    /* Submit Button */
-    .btn-submit {
-      background: var(--primary-gradient);
-      border: none;
-      color: white;
-      font-weight: 600;
-      font-size: 1.1rem;
-      padding: 1rem 2rem;
-      border-radius: 0.75rem;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow-md);
-    }
-
-    .btn-submit:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-      color: white;
-    }
-
-    .btn-submit:active {
-      transform: translateY(0);
-    }
-
-    .btn-submit:disabled {
-      background: var(--muted-text-color);
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-submit .spinner-border {
-      width: 1.2rem;
-      height: 1.2rem;
-      margin-right: 0.5rem;
-    }
-
-    /* Tooltip Trigger */
-    .tooltip-trigger {
-      cursor: help;
-      color: var(--muted-text-color);
-      transition: color 0.2s ease;
-    }
-
-    .tooltip-trigger:hover {
-      color: var(--primary-color);
-    }
-
-    /* Responsive */
-    @media (max-width: 991.98px) {
-      .form-section {
-        padding: 2rem;
-      }
-
-      .summary-section {
-        margin-top: 2rem;
-        position: static !important;
-      }
-
-      .total-value {
-        font-size: 1.75rem;
-      }
-
-      .funcoes-table td {
-        padding: 0.75rem 0.5rem;
-      }
-
-      .funcoes-table .form-control-sm {
-        height: 40px;
-      }
-    }
-
-    @media (max-width: 767.98px) {
-      .container {
-        padding: 1rem;
-      }
-
-      .form-section {
-        padding: 1.5rem;
-      }
-
-      .section-title {
-        font-size: 1.1rem;
-      }
-
-      .funcoes-table {
-        font-size: 0.875rem;
-      }
-
-      .total-value {
-        font-size: 1.5rem;
-      }
-    }
-
-    /* Loading Overlay */
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .loading-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .loading-spinner {
-      width: 3rem;
-      height: 3rem;
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      border-top: 4px solid white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Alert Custom */
-    .alert-custom {
-      border: none;
-      border-radius: 0.75rem;
-      padding: 1rem 1.25rem;
-      font-weight: 500;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .alert-custom.alert-info {
-      background-color: rgba(var(--primary-rgb), 0.1);
-      color: var(--primary-color);
-      border-left: 4px solid var(--primary-color);
-    }
-
-    .alert-custom.alert-warning {
-      background-color: rgba(245, 158, 11, 0.1);
-      color: var(--warning-color);
-      border-left: 4px solid var(--warning-color);
-    }
-  </style>
+  <!-- Custom CSS -->
+  <%= stylesheet_link_tag 'propostas', 'data-turbo-track': 'reload' %>
 </head>
-<body>
-  <div class="container py-5" data-controller="proposta-form">
-    <%= form_with model: @proposta, local: true, html: { class: "needs-validation", novalidate: true } do |form| %>
-      <div class="row">
-        <div class="col-lg-7">
+
+<body class="proposta-page">
+  <!-- Header -->
+  <header class="proposta-header">
+    <div class="container">
+      <h1>Nova Proposta</h1>
+      <p>Crie orçamentos profissionais de forma rápida e precisa</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="proposta-container" data-controller="proposta-form">
+    <%= form_with model: @proposta, local: true, html: {
+      class: "needs-validation",
+      novalidate: true,
+      'data-action': 'submit->proposta-form#handleSubmit'
+    } do |form| %>
+
+      <div class="row g-4">
+        <!-- Coluna Principal - Formulário -->
+        <div class="col-lg-8">
           <div class="form-section">
-            <div class="d-flex justify-content-between align-items-start mb-4">
+            <!-- Cabeçalho da seção -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
               <div>
-                <h1 class="h2 mb-2 fw-bold">Nova Proposta</h1>
-                <p class="text-muted mb-0">Preencha os dados abaixo para gerar o cálculo da proposta.</p>
+                <h2 class="section-title">
+                  <i class="bi bi-file-earmark-text"></i>
+                  Dados da Proposta
+                </h2>
+                <p class="section-subtitle">
+                  Configure os parâmetros básicos e selecione as funções necessárias
+                </p>
               </div>
-              <div class="funcoes-counter" data-proposta-form-target="funcoesCounter">
-                <i class="bi bi-list-check me-1"></i>
-                <span data-proposta-form-target="funcoesCountText">0 funções selecionadas</span>
+
+              <!-- Indicador de salvamento automático -->
+              <div class="badge badge-success d-none" data-proposta-form-target="autoSaveIndicator">
+                <i class="bi bi-cloud-check"></i>
+                Salvo automaticamente
               </div>
             </div>
 
-            <div class="alert alert-info alert-custom">
-              <i class="bi bi-info-circle me-2"></i>
-              <strong>Dica:</strong> Ative as funções desejadas e ajuste as horas e valores conforme necessário.
+            <!-- Barra de progresso -->
+            <div class="progress-indicator mb-4">
+              <div class="progress-bar"
+                   data-proposta-form-target="progressBar"
+                   style="width: 0%"
+                   role="progressbar"
+                   aria-valuenow="0"
+                   aria-valuemin="0"
+                   aria-valuemax="100">
+              </div>
             </div>
 
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <%= form.label :revisao, class: "form-label required" %>
-                <div class="input-group">
-                  <span class="input-group-text">
-                    <i class="bi bi-arrow-repeat"></i>
-                  </span>
-                  <%= form.number_field :revisao,
-                      class: "form-control",
-                      min: 1,
-                      required: true,
-                      placeholder: "Ex: 1",
-                      'data-action': 'input->proposta-form#updateWithDebounce blur->proposta-form#validateField',
-                      'aria-describedby': 'revisao-help' %>
-                  <div class="invalid-feedback" data-proposta-form-target="revisaoError"></div>
+            <!-- Alertas -->
+            <div data-proposta-form-target="alertContainer"></div>
+
+            <!-- Campos do formulário -->
+            <div class="row g-3">
+              <!-- Campo Revisão -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <%= form.label :revisao, class: "form-label required" do %>
+                    Revisão
+                    <i class="bi bi-question-circle tooltip-trigger"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Número sequencial da revisão desta proposta">
+                    </i>
+                  <% end %>
+
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-arrow-repeat"></i>
+                    </span>
+                    <%= form.number_field :revisao,
+                        class: "form-control",
+                        min: 1,
+                        required: true,
+                        placeholder: "Ex: 1",
+                        'data-proposta-form-target': 'revisaoInput',
+                        'data-action': 'input->proposta-form#validateAndUpdate blur->proposta-form#validateField',
+                        'aria-describedby': 'revisao-help revisao-error' %>
+                  </div>
+                  <div class="invalid-feedback" id="revisao-error" data-proposta-form-target="revisaoError"></div>
+                  <small id="revisao-help" class="form-hint">
+                    Número da revisão da proposta (inicia em 1)
+                  </small>
                 </div>
-                <small id="revisao-help" class="form-text text-muted">
-                  Número da revisão da proposta
-                </small>
               </div>
 
-              <div class="col-md-6 mb-4">
-                <%= form.label :margem_lucro, class: "form-label required" do %>
-                  Margem Adicional (%)
-                  <i class="bi bi-question-circle tooltip-trigger"
-                     data-bs-toggle="tooltip"
-                     data-bs-placement="top"
-                     title="Percentual adicional aplicado sobre o valor base para margem de lucro"></i>
-                <% end %>
-                <div class="input-group">
-                  <span class="input-group-text">
-                    <i class="bi bi-percent"></i>
-                  </span>
-                  <%= form.number_field :margem_lucro,
-                      class: "form-control",
-                      step: 0.01,
-                      min: 0,
-                      max: 100,
-                      required: true,
-                      placeholder: "Ex: 15.00",
-                      'data-proposta-form-target': 'margemLucro',
-                      'data-action': 'input->proposta-form#updateWithDebounce blur->proposta-form#validateField',
-                      'aria-describedby': 'margem-help' %>
-                  <div class="invalid-feedback" data-proposta-form-target="margemLucroError"></div>
+              <!-- Campo Margem de Lucro -->
+              <div class="col-md-6">
+                <div class="form-group">
+                  <%= form.label :margem_lucro, class: "form-label required" do %>
+                    Margem Adicional
+                    <i class="bi bi-question-circle tooltip-trigger"
+                       data-bs-toggle="tooltip"
+                       data-bs-placement="top"
+                       title="Percentual adicional aplicado sobre o valor base para definir a margem de lucro do projeto">
+                    </i>
+                  <% end %>
+
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-percent"></i>
+                    </span>
+                    <%= form.number_field :margem_lucro,
+                        class: "form-control",
+                        step: 0.01,
+                        min: 0,
+                        max: 100,
+                        required: true,
+                        placeholder: "Ex: 15.00",
+                        'data-proposta-form-target': 'margemLucro',
+                        'data-action': 'input->proposta-form#validateAndUpdate blur->proposta-form#validateField',
+                        'aria-describedby': 'margem-help margem-error' %>
+                    <span class="input-group-text">%</span>
+                  </div>
+                  <div class="invalid-feedback" id="margem-error" data-proposta-form-target="margemLucroError"></div>
+                  <small id="margem-help" class="form-hint">
+                    Percentual de 0% a 100% sobre o valor base
+                  </small>
                 </div>
-                <small id="margem-help" class="form-text text-muted">
-                  Percentual de 0% a 100%
-                </small>
               </div>
             </div>
 
             <hr class="my-4">
 
-            <div class="d-flex justify-content-between align-items-start mb-3">
-              <div>
-                <h5 class="section-title mb-1">
+            <!-- Seção de Funções -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="section-title">
                   <i class="bi bi-list-check"></i>
-                  Funções da Proposta
-                </h5>
-                <div class="section-subtitle">
-                  Selecione e configure as funções necessárias para o projeto
+                  Funções do Projeto
+                </h3>
+
+                <div class="d-flex gap-2">
+                  <!-- Contador de funções -->
+                  <div class="funcoes-counter" data-proposta-form-target="funcoesCounter">
+                    <i class="bi bi-check2-square"></i>
+                    <span data-proposta-form-target="funcoesCountText">0 funções selecionadas</span>
+                  </div>
+
+                  <!-- Botão de ações em massa -->
+                  <div class="dropdown">
+                    <button class="btn btn-outline-primary btn-sm dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                      <i class="bi bi-lightning"></i>
+                      Ações
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <a class="dropdown-item" href="#" data-action="click->proposta-form#selectAllFunctions">
+                          <i class="bi bi-check-all me-2"></i>
+                          Selecionar Todas
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="#" data-action="click->proposta-form#deselectAllFunctions">
+                          <i class="bi bi-x-square me-2"></i>
+                          Desmarcar Todas
+                        </a>
+                      </li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li>
+                        <a class="dropdown-item" href="#" data-action="click->proposta-form#selectMOI">
+                          <i class="bi bi-person-badge me-2"></i>
+                          Selecionar MOI
+                        </a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="#" data-action="click->proposta-form#selectMOD">
+                          <i class="bi bi-person-gear me-2"></i>
+                          Selecionar MOD
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
-              <button type="button"
-                      class="btn btn-outline-primary btn-sm"
-                      data-action="click->proposta-form#toggleAllFunctions"
-                      data-proposta-form-target="toggleAllBtn">
-                <i class="bi bi-check2-all me-1"></i>
-                Selecionar Todas
-              </button>
-            </div>
 
-            <div class="table-responsive">
-              <table class="table funcoes-table">
-                <thead class="d-none d-md-table-header-group">
-                  <tr class="text-muted">
-                    <th style="width: 60px;"></th>
-                    <th>Função</th>
-                    <th style="width: 130px;">Horas</th>
-                    <th style="width: 140px;">Valor/Hora</th>
-                    <th style="width: 120px;" class="text-end">Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% @funcoes.each_with_index do |funcao, idx| %>
-                    <tr data-proposta-form-target="funcaoRow" data-funcao-id="<%= funcao.id %>">
-                      <td class="ps-0">
-                        <div class="form-check form-switch">
-                          <%= check_box_tag "proposta[proposta_funcoes_attributes][#{idx}][funcao_id]",
-                              funcao.id, false,
-                              id: "funcao_#{funcao.id}",
-                              class: "form-check-input",
-                              'data-action': 'change->proposta-form#toggleRow',
-                              'aria-label': "Ativar função #{funcao.nome}" %>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="funcao-nome">
-                          <%= funcao.nome %>
-                        </div>
-                      </td>
-                      <td style="min-width: 130px;">
-                        <%= number_field_tag "proposta[proposta_funcoes_attributes][#{idx}][quantidade_horas]", nil,
-                            step: 0.5,
-                            min: 0,
-                            max: 500,
-                            class: "form-control form-control-sm",
-                            placeholder: "Qtd. horas",
-                            title: "Digite a quantidade de horas estimadas para esta função",
-                            disabled: true,
-                            'data-action': 'input->proposta-form#updateWithDebounce blur->proposta-form#formatHoursInput keydown->proposta-form#handleKeydown',
-                            'aria-label': "Horas para #{funcao.nome}" %>
-                      </td>
-                      <td style="min-width: 140px;">
-                        <%= number_field_tag "proposta[proposta_funcoes_attributes][#{idx}][valor_hora]",
-                            funcao.valor_base,
-                            step: 0.01,
-                            min: 0,
-                            max: 10000,
-                            class: "form-control form-control-sm",
-                            placeholder: "R$ por hora",
-                            title: "Digite o valor por hora para esta função",
-                            disabled: true,
-                            'data-action': 'input->proposta-form#updateWithDebounce blur->proposta-form#formatCurrencyInput keydown->proposta-form#handleKeydown',
-                            'aria-label': "Valor por hora para #{funcao.nome}" %>
-                      </td>
+              <!-- Campo de busca -->
+              <div class="search-container mb-3">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text"
+                       class="form-control search-input"
+                       placeholder="Buscar função por nome..."
+                       data-proposta-form-target="searchInput"
+                       data-action="input->proposta-form#filterFunctions">
+                <button type="button"
+                        class="search-clear"
+                        data-action="click->proposta-form#clearSearch">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
 
-                      <td class="subtotal-cell text-end" data-proposta-form-target="subtotalCell">
-                        —
-                      </td>
+              <!-- Tabela de funções -->
+              <div class="table-responsive">
+                <table class="table funcoes-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">
+                        <span class="d-none d-md-inline">Ativo</span>
+                      </th>
+                      <th>Função</th>
+                      <th style="width: 130px;">Horas</th>
+                      <th style="width: 140px;">Valor/Hora</th>
+                      <th style="width: 130px;" class="text-end">Subtotal</th>
                     </tr>
-                  <% end %>
+                  </thead>
+                  <tbody>
+                    <% @funcoes.each_with_index do |funcao, idx| %>
+                      <tr data-proposta-form-target="funcaoRow"
+                          data-funcao-id="<%= funcao.id %>"
+                          data-funcao-nome="<%= funcao.nome %>"
+                          data-funcao-tipo="<%= funcao.tipo %>"
+                          class="funcao-row">
 
-                </tbody>
-              </table>
+                        <!-- Checkbox -->
+                        <td data-label="Ativar">
+                          <div class="form-check form-switch">
+                            <%= check_box_tag "proposta[proposta_funcoes_attributes][#{idx}][funcao_id]",
+                                funcao.id, false,
+                                id: "funcao_#{funcao.id}",
+                                class: "form-check-input",
+                                'data-action': 'change->proposta-form#toggleRow',
+                                'aria-label': "Ativar função #{funcao.nome}" %>
+                          </div>
+                        </td>
+
+                        <!-- Nome da função -->
+                        <td data-label="Função">
+                          <div class="funcao-nome">
+                            <span><%= funcao.nome %></span>
+                            <span class="funcao-badge <%= funcao.tipo %>">
+                              <%= funcao.tipo.upcase %>
+                            </span>
+                          </div>
+                        </td>
+
+                        <!-- Horas -->
+                        <td data-label="Horas">
+                          <%= number_field_tag "proposta[proposta_funcoes_attributes][#{idx}][quantidade_horas]",
+                              nil,
+                              step: 0.5,
+                              min: 0,
+                              max: 999,
+                              class: "form-control form-control-sm",
+                              placeholder: "0",
+                              disabled: true,
+                              'data-action': 'input->proposta-form#updateCalculations blur->proposta-form#formatHoursInput',
+                              'data-proposta-form-target': 'horasInput',
+                              'aria-label': "Horas para #{funcao.nome}" %>
+                        </td>
+
+                        <!-- Valor por hora -->
+                        <td data-label="Valor/Hora">
+                          <div class="input-group input-group-sm">
+                            <span class="input-group-text">R$</span>
+                            <%= number_field_tag "proposta[proposta_funcoes_attributes][#{idx}][valor_hora]",
+                                funcao.valor_base,
+                                step: 0.01,
+                                min: 0,
+                                max: 9999.99,
+                                class: "form-control form-control-sm",
+                                disabled: true,
+                                'data-action': 'input->proposta-form#updateCalculations blur->proposta-form#formatCurrencyInput',
+                                'data-proposta-form-target': 'valorHoraInput',
+                                'aria-label': "Valor por hora para #{funcao.nome}" %>
+                          </div>
+                        </td>
+
+                        <!-- Subtotal -->
+                        <td class="subtotal-cell text-end"
+                            data-label="Subtotal"
+                            data-proposta-form-target="subtotalCell">
+                          <span class="text-muted">—</span>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Estado vazio -->
+              <div class="empty-state d-none" data-proposta-form-target="emptyState">
+                <i class="bi bi-inbox"></i>
+                <h6>Nenhuma função encontrada</h6>
+                <p class="mb-0">Tente ajustar os filtros de busca</p>
+              </div>
             </div>
 
-            <!-- Estado vazio -->
-            <div class="empty-state d-none" data-proposta-form-target="emptyState">
-              <i class="bi bi-inbox"></i>
-              <h6 class="mb-2">Nenhuma função selecionada</h6>
-              <p class="mb-0">Ative pelo menos uma função para calcular a proposta</p>
-            </div>
+            <!-- Botões de ação -->
+            <div class="d-flex justify-content-between align-items-center">
+              <!-- Botão Salvar Rascunho -->
+              <button type="button"
+                      class="btn btn-secondary"
+                      data-action="click->proposta-form#saveDraft">
+                <i class="bi bi-save"></i>
+                Salvar Rascunho
+              </button>
 
-            <div class="d-grid mt-5">
-              <%= form.submit class: "btn btn-submit",
+              <!-- Botão Criar Proposta -->
+              <%= form.submit class: "btn btn-submit btn-primary",
                   'data-proposta-form-target': 'submitBtn',
                   'data-action': 'click->proposta-form#showConfirmation' do %>
                 <span data-proposta-form-target="submitText">
-                  <i class="bi bi-plus-circle me-2"></i>
+                  <i class="bi bi-plus-circle"></i>
                   Criar Proposta
                 </span>
                 <span class="d-none" data-proposta-form-target="submitLoading">
@@ -707,57 +337,108 @@
           </div>
         </div>
 
-        <div class="col-lg-5">
-          <div class="sticky-top" style="top: 2rem;">
+        <!-- Coluna Lateral - Resumo -->
+        <div class="col-lg-4">
+          <div class="sticky-summary">
             <div class="summary-section">
-              <h5 class="section-title">
+              <h3 class="section-title">
                 <i class="bi bi-calculator"></i>
-                Resumo da Proposta
-              </h5>
+                Resumo do Orçamento
+              </h3>
 
-              <ul class="list-unstyled summary-list">
+              <!-- Lista de resumo -->
+              <ul class="summary-list">
                 <li>
                   <span>
-                    <i class="bi bi-currency-dollar me-1"></i>
+                    <i class="bi bi-currency-dollar"></i>
                     Valor Base
                   </span>
                   <strong data-proposta-form-target="valorBaseDisplay">R$ 0,00</strong>
                 </li>
                 <li>
                   <span>
-                    <i class="bi bi-graph-up me-1"></i>
+                    <i class="bi bi-graph-up-arrow"></i>
                     Margem Adicional
-                    <small class="d-block text-muted" data-proposta-form-target="margemPercentDisplay">
-                      (0%)
-                    </small>
+                    <small class="d-block" data-proposta-form-target="margemPercentDisplay">(0%)</small>
                   </span>
                   <strong data-proposta-form-target="margemAdicionalDisplay">R$ 0,00</strong>
                 </li>
+              </ul>
+
+              <hr>
+
+              <!-- Estatísticas -->
+              <ul class="summary-list">
                 <li>
                   <span>
-                    <i class="bi bi-list-ol me-1"></i>
+                    <i class="bi bi-list-check"></i>
                     Funções Ativas
                   </span>
                   <strong data-proposta-form-target="funcoesAtivasDisplay">0</strong>
                 </li>
                 <li>
                   <span>
-                    <i class="bi bi-clock me-1"></i>
+                    <i class="bi bi-clock-history"></i>
                     Total de Horas
                   </span>
                   <strong data-proposta-form-target="totalHorasDisplay">0h</strong>
                 </li>
+                <li>
+                  <span>
+                    <i class="bi bi-person-badge"></i>
+                    Funções MOI
+                  </span>
+                  <strong data-proposta-form-target="funcoesMOIDisplay">0</strong>
+                </li>
+                <li>
+                  <span>
+                    <i class="bi bi-person-gear"></i>
+                    Funções MOD
+                  </span>
+                  <strong data-proposta-form-target="funcoesMODDisplay">0</strong>
+                </li>
               </ul>
 
+              <!-- Total -->
               <div class="total-summary" aria-live="polite">
                 <div class="total-label">
-                  <i class="bi bi-award me-1"></i>
+                  <i class="bi bi-award"></i>
                   Valor Total da Proposta
                 </div>
-                <div class="total-value" data-proposta-form-target="valorTotalDisplay">R$ 0,00</div>
+                <div class="total-value" data-proposta-form-target="valorTotalDisplay">
+                  R$ 0,00
+                </div>
               </div>
 
+              <!-- Campos hidden -->
               <%= form.hidden_field :valor_total, data: { proposta_form_target: "valorTotalHidden" } %>
+              <%= hidden_field_tag :draft_data, nil, data: { proposta_form_target: "draftData" } %>
+            </div>
+
+            <!-- Card de Ajuda -->
+            <div class="form-section mt-3">
+              <h4 class="h6 mb-3">
+                <i class="bi bi-lightbulb text-warning"></i>
+                Dicas Rápidas
+              </h4>
+              <ul class="list-unstyled small text-muted">
+                <li class="mb-2">
+                  <i class="bi bi-check2 text-success"></i>
+                  Use <kbd>Tab</kbd> para navegar entre campos
+                </li>
+                <li class="mb-2">
+                  <i class="bi bi-check2 text-success"></i>
+                  Digite <kbd>/</kbd> para buscar funções
+                </li>
+                <li class="mb-2">
+                  <i class="bi bi-check2 text-success"></i>
+                  <kbd>Ctrl+S</kbd> salva um rascunho
+                </li>
+                <li>
+                  <i class="bi bi-check2 text-success"></i>
+                  Clique no <i class="bi bi-keyboard"></i> para mais atalhos
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -768,34 +449,48 @@
   <!-- Modal de Confirmação -->
   <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow-lg">
-        <div class="modal-header border-0 pb-0">
+      <div class="modal-content">
+        <div class="modal-header">
           <h5 class="modal-title" id="confirmModalLabel">
-            <i class="bi bi-check-circle text-success me-2"></i>
-            Confirmar Proposta
+            <i class="bi bi-check-circle text-success"></i>
+            Confirmar Criação da Proposta
           </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
         </div>
-        <div class="modal-body pt-2">
-          <p class="mb-3">Você está prestes a criar uma nova proposta com os seguintes dados:</p>
-          <ul class="list-unstyled">
-            <li><strong>Revisão:</strong> <span data-proposta-form-target="confirmRevisao">-</span></li>
-            <li><strong>Margem:</strong> <span data-proposta-form-target="confirmMargem">-</span></li>
-            <li><strong>Total:</strong> <span data-proposta-form-target="confirmTotal">-</span></li>
-            <li><strong>Funções:</strong> <span data-proposta-form-target="confirmFuncoes">-</span></li>
-          </ul>
-          <div class="alert alert-warning alert-custom">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            Esta ação não pode ser desfeita.
+        <div class="modal-body">
+          <p class="mb-4">Por favor, revise os dados da proposta antes de confirmar:</p>
+
+          <div class="card bg-light border-0 p-3">
+            <dl class="row mb-0">
+              <dt class="col-sm-4">Revisão:</dt>
+              <dd class="col-sm-8" data-proposta-form-target="confirmRevisao">—</dd>
+
+              <dt class="col-sm-4">Margem:</dt>
+              <dd class="col-sm-8" data-proposta-form-target="confirmMargem">—</dd>
+
+              <dt class="col-sm-4">Funções Ativas:</dt>
+              <dd class="col-sm-8" data-proposta-form-target="confirmFuncoes">—</dd>
+
+              <dt class="col-sm-4">Total de Horas:</dt>
+              <dd class="col-sm-8" data-proposta-form-target="confirmHoras">—</dd>
+
+              <dt class="col-sm-4">Valor Total:</dt>
+              <dd class="col-sm-8 fw-bold text-primary" data-proposta-form-target="confirmTotal">—</dd>
+            </dl>
+          </div>
+
+          <div class="alert alert-custom alert-warning mt-3">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Atenção:</strong> Esta ação criará uma nova proposta no sistema e não poderá ser desfeita.
           </div>
         </div>
-        <div class="modal-footer border-0 pt-0">
+        <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            <i class="bi bi-x-circle me-1"></i>
+            <i class="bi bi-x-circle"></i>
             Cancelar
           </button>
-          <button type="button" class="btn btn-success" data-action="click->proposta-form#confirmSubmit">
-            <i class="bi bi-check-circle me-1"></i>
+          <button type="button" class="btn btn-primary" data-action="click->proposta-form#confirmSubmit">
+            <i class="bi bi-check-circle"></i>
             Confirmar e Criar
           </button>
         </div>
@@ -803,53 +498,342 @@
     </div>
   </div>
 
-  <!-- Loading Overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
+  <!-- Modal de Rascunho -->
+  <div class="modal fade" id="draftModal" tabindex="-1" aria-labelledby="draftModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="draftModalLabel">
+            <i class="bi bi-save text-info"></i>
+            Salvar Rascunho
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p>Deseja salvar o estado atual como rascunho?</p>
+          <p class="text-muted small">
+            O rascunho será salvo localmente no seu navegador e pode ser recuperado posteriormente.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-info" data-action="click->proposta-form#saveDraftConfirm">
+            <i class="bi bi-save"></i>
+            Salvar Rascunho
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay" data-proposta-form-target="loadingOverlay">
+    <div class="text-center">
+      <div class="loading-spinner mb-3"></div>
+      <h6 class="text-white mb-2">Processando...</h6>
+      <p class="text-white-50 mb-0">Por favor, aguarde</p>
+    </div>
+  </div>
+
+  <!-- Atalhos de Teclado -->
+  <div class="keyboard-shortcuts">
+    <div class="shortcuts-toggle" data-action="click->proposta-form#toggleShortcuts">
+      <i class="bi bi-keyboard"></i>
+    </div>
+
+    <div class="shortcuts-panel" data-proposta-form-target="shortcutsPanel">
+      <h6 class="mb-3">
+        <i class="bi bi-keyboard me-2"></i>
+        Atalhos de Teclado
+      </h6>
+
+      <div class="shortcut-item">
+        <span>Buscar funções</span>
+        <kbd class="shortcut-key">/</kbd>
+      </div>
+
+      <div class="shortcut-item">
+        <span>Salvar rascunho</span>
+        <kbd class="shortcut-key">Ctrl+S</kbd>
+      </div>
+
+      <div class="shortcut-item">
+        <span>Selecionar todas</span>
+        <kbd class="shortcut-key">Ctrl+A</kbd>
+      </div>
+
+      <div class="shortcut-item">
+        <span>Limpar seleção</span>
+        <kbd class="shortcut-key">Ctrl+D</kbd>
+      </div>
+
+      <div class="shortcut-item">
+        <span>Criar proposta</span>
+        <kbd class="shortcut-key">Ctrl+Enter</kbd>
+      </div>
+
+      <div class="shortcut-item">
+        <span>Fechar painéis</span>
+        <kbd class="shortcut-key">Esc</kbd>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+    <div class="toast-container" data-proposta-form-target="toastContainer">
+      <!-- Toasts serão adicionados aqui dinamicamente -->
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 
   <script>
-    // Inicialização de tooltips
+    // Configurações globais
+    window.PropostaConfig = {
+      currency: 'BRL',
+      locale: 'pt-BR',
+      autoSaveInterval: 30000, // 30 segundos
+      debounceDelay: 300,
+      animationDuration: 200
+    };
+
+    // Inicialização quando o DOM estiver pronto
     document.addEventListener('DOMContentLoaded', function() {
-      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-      const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+      // Inicializar tooltips
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl, {
+          trigger: 'hover focus',
+          delay: { show: 500, hide: 100 }
+        });
       });
 
-      // Smooth scroll para âncoras
+      // Inicializar popovers
+      const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+      popoverTriggerList.forEach(function(popoverTriggerEl) {
+        new bootstrap.Popover(popoverTriggerEl);
+      });
+
+      // Smooth scroll para navegação interna
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
           e.preventDefault();
           const target = document.querySelector(this.getAttribute('href'));
           if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
           }
         });
       });
+
+      // Prevenção de saída acidental
+      let hasUnsavedChanges = false;
+
+      // Marcar quando há alterações
+      document.addEventListener('input', function(e) {
+        if (e.target.matches('input, select, textarea')) {
+          hasUnsavedChanges = true;
+        }
+      });
+
+      // Aviso antes de sair
+      window.addEventListener('beforeunload', function(e) {
+        if (hasUnsavedChanges) {
+          e.preventDefault();
+          e.returnValue = 'Você tem alterações não salvas. Deseja realmente sair?';
+        }
+      });
+
+      // Limpar flag quando formulário for enviado
+      document.addEventListener('submit', function() {
+        hasUnsavedChanges = false;
+      });
+
+      // Atalhos de teclado globais
+      document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + S - Salvar rascunho
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          const controller = document.querySelector('[data-controller="proposta-form"]');
+          if (controller) {
+            controller.dispatchEvent(new CustomEvent('proposta-form:save-draft'));
+          }
+        }
+
+        // Ctrl/Cmd + A - Selecionar todas as funções
+        if ((e.ctrlKey || e.metaKey) && e.key === 'a' && e.target.tagName !== 'INPUT') {
+          e.preventDefault();
+          const controller = document.querySelector('[data-controller="proposta-form"]');
+          if (controller) {
+            controller.dispatchEvent(new CustomEvent('proposta-form:select-all'));
+          }
+        }
+
+        // Ctrl/Cmd + D - Desmarcar todas as funções
+        if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+          e.preventDefault();
+          const controller = document.querySelector('[data-controller="proposta-form"]');
+          if (controller) {
+            controller.dispatchEvent(new CustomEvent('proposta-form:deselect-all'));
+          }
+        }
+
+        // Ctrl/Cmd + Enter - Criar proposta
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          e.preventDefault();
+          const submitBtn = document.querySelector('[data-proposta-form-target="submitBtn"]');
+          if (submitBtn && !submitBtn.disabled) {
+            submitBtn.click();
+          }
+        }
+
+        // / - Focar no campo de busca
+        if (e.key === '/' && e.target.tagName !== 'INPUT') {
+          e.preventDefault();
+          const searchInput = document.querySelector('[data-proposta-form-target="searchInput"]');
+          if (searchInput) {
+            searchInput.focus();
+          }
+        }
+
+        // Esc - Fechar painéis/modais
+        if (e.key === 'Escape') {
+          // Fechar painel de atalhos
+          // Fechar painel de atalhos
+          const shortcutsPanel = document.querySelector('[data-proposta-form-target="shortcutsPanel"]');
+          if (shortcutsPanel && shortcutsPanel.classList.contains('show')) {
+            shortcutsPanel.classList.remove('show');
+          }
+
+          // Limpar campo de busca
+          const searchInput = document.querySelector('[data-proposta-form-target="searchInput"]');
+          if (searchInput && searchInput.value) {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input'));
+          }
+        }
+      });
+
+      // Função para mostrar toast
+      window.showToast = function(message, type = 'info', duration = 5000) {
+        const toastContainer = document.querySelector('[data-proposta-form-target="toastContainer"]');
+        if (!toastContainer) return;
+
+        const toastId = 'toast-' + Date.now();
+        const iconClass = {
+          'success': 'bi-check-circle-fill',
+          'error': 'bi-exclamation-triangle-fill',
+          'warning': 'bi-exclamation-triangle-fill',
+          'info': 'bi-info-circle-fill'
+        }[type] || 'bi-info-circle-fill';
+
+        const bgClass = {
+          'success': 'bg-success',
+          'error': 'bg-danger',
+          'warning': 'bg-warning',
+          'info': 'bg-info'
+        }[type] || 'bg-info';
+
+        const toastHtml = `
+          <div id="${toastId}" class="toast align-items-center ${bgClass} text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+              <div class="toast-body">
+                <i class="bi ${iconClass} me-2"></i>
+                ${message}
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar"></button>
+            </div>
+          </div>
+        `;
+
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+        const toastElement = document.getElementById(toastId);
+        const toast = new bootstrap.Toast(toastElement, {
+          autohide: true,
+          delay: duration
+        });
+
+        toast.show();
+
+        // Remover elemento do DOM após fechar
+        toastElement.addEventListener('hidden.bs.toast', function() {
+          this.remove();
+        });
+      };
+
+      // Função para formatação de moeda
+      window.formatCurrency = function(value, currency = 'BRL', locale = 'pt-BR') {
+        return new Intl.NumberFormat(locale, {
+          style: 'currency',
+          currency: currency,
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(value || 0);
+      };
+
+      // Função para formatação de horas
+      window.formatHours = function(value) {
+        const hours = parseFloat(value) || 0;
+        if (hours === 0) return '0h';
+        if (hours === 1) return '1h';
+        if (hours % 1 === 0) return `${hours}h`;
+        return `${hours}h`;
+      };
+
+      // Função para animação de mudança de valor
+      window.animateValueChange = function(element, newValue, duration = 300) {
+        if (!element) return;
+
+        element.style.transition = `all ${duration}ms ease`;
+        element.classList.add('value-change');
+
+        setTimeout(() => {
+          element.textContent = newValue;
+          setTimeout(() => {
+            element.classList.remove('value-change');
+          }, duration);
+        }, duration / 2);
+      };
+
+      // Função para salvar no localStorage
+      window.saveToLocalStorage = function(key, data) {
+        try {
+          localStorage.setItem(key, JSON.stringify(data));
+          return true;
+        } catch (error) {
+          console.error('Erro ao salvar no localStorage:', error);
+          return false;
+        }
+      };
+
+      // Função para carregar do localStorage
+      window.loadFromLocalStorage = function(key) {
+        try {
+          const data = localStorage.getItem(key);
+          return data ? JSON.parse(data) : null;
+        } catch (error) {
+          console.error('Erro ao carregar do localStorage:', error);
+          return null;
+        }
+      };
+
+      // Verificar se há rascunho salvo
+      const savedDraft = window.loadFromLocalStorage('proposta-draft');
+      if (savedDraft) {
+        window.showToast('Rascunho encontrado. Deseja carregar?', 'info');
+        // Implementar lógica para carregar rascunho
+      }
+
+      console.log('Página de Nova Proposta carregada com sucesso!');
     });
-
-    // Formatação automática de moeda
-    function formatCurrency(value) {
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      }).format(value || 0);
-    }
-
-    // Formatação de horas
-    function formatHours(value) {
-      const hours = parseFloat(value) || 0;
-      return hours === 1 ? '1 hora' : `${hours} horas`;
-    }
-
-    // Animação de valor alterado
-    function animateValueChange(element) {
-      element.classList.add('value-change');
-      setTimeout(() => element.classList.remove('value-change'), 500);
-    }
   </script>
 </body>
 </html>
